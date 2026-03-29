@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model RevenuePipeline {
+  id              String    @id @default(uuid())
+  channel         String
+  metadata        String
+  amount          Float
+  status          String
+  stage           String    @default("NEURAL_PROSPECT")
+  leadId          String?
+  opportunityId   String?
+  currency        String    @default("USD")
+  contactMethod   String?
+  notes           String?
+  lostReason      String?
+  probability     Float     @default(0.5)
+  dealValue       Float     @default(0)
+  weightedValue   Float     @default(0)
+  nextFollowUp    DateTime?
+  lastContactAt   DateTime?
+  closedAt        DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model MarketOpportunity {
+  id               String   @id @default(uuid())
+  title            String
+  status           String   // DETECTED, VALIDATED, PURSUING, EXPIRED
+  demandScore      Float
+  confidence       Float
+  marginEstimate   Float?
+  sector           String?
+  niche            String?
+  trendDirection   String?
+  entryBarrier     String?
+  competitionLevel String?
+  metadata         String?  // JSON
+  data             String?  // JSON
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model RevenueEvent {
+  id          String    @id @default(uuid())
+  isVerified  Boolean   @default(false)
+  verifiedAt  DateTime?
+  metadata    String?   // JSON
+  amount      Float
+  currency    String    @default("USD")
+  channel     String
+  source      String?
+  description String?
+  pipelineId  String?
+  proofUrl    String?
+  type        String    @default("INCOME")
+  occurredAt  DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+}
+
+model VaultCredential {
+  id        String   @id @default(uuid())
+  type      String   // BINANCE_LIVE, STRIPE_SECRET, etc.
+  metadata  String?  // JSON storing apiKey, secret, etc.
+  createdAt DateTime @default(now())
+}
+
+model EconomyAccount {
+  id        String   @id @default(uuid())
+  balance   Float    @default(0)
+  currency  String   @default("USD")
+  type      String?
+  createdAt DateTime @default(now())
+}
+
+model EconomyTransaction {
+  id        String   @id @default(uuid())
+  amount    Float
+  type      String   // DEBIT, CREDIT
+  reference String?
+  createdAt DateTime @default(now())
+}
+
+model OutreachCampaign {
+  id             String   @id @default(uuid())
+  title          String
+  name           String?
+  channel        String?
+  targetSegment  String?
+  totalTargets   Int      @default(0)
+  schedule       String?
+  status         String   @default("DRAFT")
+  sent           Int      @default(0)
+  opened         Int      @default(0)
+  replied        Int      @default(0)
+  converted      Int      @default(0)
+  metadata       String?
+  createdAt      DateTime @default(now())
+}
+
+model MarketSignal {
+  id              String   @id @default(uuid())
+  type            String
+  strength        Float
+  source          String
+  keyword         String?
+  region          String?
+  signalStrength  Float?
+  rawData         String?
+  interpretation  String?
+  actionable      Boolean  @default(false)
+  actedOn         Boolean  @default(false)
+  data            String?
+  createdAt       DateTime @default(now())
+}
