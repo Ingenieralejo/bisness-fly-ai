@@ -21,11 +21,33 @@ import {
   Crown,
   BarChart3,
   Sparkles,
+  Heart,
+  XCircle,
+  RefreshCw,
+  DollarSign,
+  ServerCrash,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────
 //  Type Definitions
 // ─────────────────────────────────────────────────────────────
+
+interface IntegrationHealth {
+  name: string;
+  status: "CONNECTED" | "MISSING_KEYS" | "UNREACHABLE";
+  detail: string;
+}
+
+interface KingHealthReport {
+  ollama: IntegrationHealth;
+  binance: IntegrationHealth;
+  near: IntegrationHealth;
+  telegram: IntegrationHealth;
+  twitter: IntegrationHealth;
+  gumroad: IntegrationHealth;
+  overallScore: number;
+  checkedAt: string;
+}
 
 interface TelemetryEntry {
   type: string;
@@ -49,6 +71,12 @@ interface SweepEntry {
   time: string;
 }
 
+interface PaperTradeEntry {
+  amount: number;
+  metadata: string;
+  time: string;
+}
+
 interface ProductEntry {
   title: string;
   description: string;
@@ -59,14 +87,20 @@ interface ProductEntry {
 
 interface KingStatusResponse {
   balance: number;
+  binanceBalance: number;
+  nearBalance: number;
+  totalRealSwept: number;
+  totalPaperProfit: number;
   totalSwept: number;
   threshold: number;
   nearPrice: number;
   cycleCount: number;
   currentCycleId: string;
+  health: KingHealthReport;
   logs: { type: string; data: string; time: string }[];
   telemetry: TelemetryEntry[];
   sweepHistory: SweepEntry[];
+  paperTrades: PaperTradeEntry[];
   products: ProductEntry[];
 }
 
@@ -79,7 +113,10 @@ export default function KingAgentDashboard() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isSyncing, setIsSyncing] = useState(true);
   const [lastSync, setLastSync] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<"telemetry" | "logs" | "sweeps">("telemetry");
+  const [activeTab, setActiveTab] = useState<
+    "telemetry" | "logs" | "sweeps" | "paper"
+  >("telemetry");
+  const [isForcing, setIsForcing] = useState(false);
 
   const SWEEP_THRESHOLD = 100.0;
 
@@ -117,10 +154,36 @@ export default function KingAgentDashboard() {
     return () => clearInterval(interval);
   }, [fetchRealStatus]);
 
+  const handleForceCommerce = async () => {
+    setIsForcing(true);
+    await fetch("/api/wealth-matrix/king/launch", {
+      method: "POST",
+    }).catch(() => {});
+    setLogs((prev) => [
+      {
+        id: Date.now().toString(),
+        time: new Date().toLocaleTimeString("es-CO"),
+        msg: "⚡ OVERRIDE MANUAL: Ciclo de ejecución forzado...",
+        type: "system",
+      },
+      ...prev,
+    ]);
+    // Wait a moment then refresh
+    setTimeout(async () => {
+      await fetchRealStatus();
+      setIsForcing(false);
+    }, 3000);
+  };
+
   const balance = data?.balance ?? 0;
-  const totalSwept = data?.totalSwept ?? 0;
+  const binanceBal = data?.binanceBalance ?? 0;
+  const nearBal = data?.nearBalance ?? 0;
+  const totalRealSwept = data?.totalRealSwept ?? 0;
+  const totalPaperProfit = data?.totalPaperProfit ?? 0;
   const nearPrice = data?.nearPrice ?? 0;
   const cycleCount = data?.cycleCount ?? 0;
+  const health = data?.health;
+  const overallHealth = health?.overallScore ?? 0;
 
   return (
     <div className="king-root">
@@ -145,8 +208,7 @@ export default function KingAgentDashboard() {
             <div>
               <h1 className="king-brand__title">KING AGENT</h1>
               <p className="king-brand__subtitle">
-                God Level v2.0 • Memoria Neural (15yr) • Ejecución Cero
-                Simulada
+                God Level v3.0 • Hardened Diagnostics • Zero Fake Sweeps
               </p>
             </div>
           </motion.div>
@@ -164,28 +226,71 @@ export default function KingAgentDashboard() {
             </span>
           </div>
           <button
-            className="king-launch-btn"
+            className={`king-launch-btn ${isForcing ? "king-launch-btn--forcing" : ""}`}
             id="king-force-commerce"
-            onClick={async () => {
-              await fetch("/api/wealth-matrix/king/launch", {
-                method: "POST",
-              }).catch(() => {});
-              setLogs((prev) => [
-                {
-                  id: Date.now().toString(),
-                  time: new Date().toLocaleTimeString("es-CO"),
-                  msg: "⚡ OVERRIDE MANUAL: Ciclo de ejecución forzado...",
-                  type: "system",
-                },
-                ...prev,
-              ]);
-            }}
+            onClick={handleForceCommerce}
+            disabled={isForcing}
           >
-            <Zap size={14} />
-            FORZAR COMERCIO
+            {isForcing ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Zap size={14} />
+            )}
+            {isForcing ? "EJECUTANDO..." : "FORZAR COMERCIO"}
           </button>
         </div>
       </header>
+
+      {/* ═══ HEALTH DIAGNOSTICS PANEL ═══ */}
+      {health && (
+        <motion.div
+          className="king-health-panel"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+        >
+          <div className="king-health-panel__header">
+            <div className="king-health-panel__title-row">
+              <Heart size={14} className="text-red" />
+              <span>Diagnóstico de Integraciones</span>
+            </div>
+            <div
+              className={`king-health-panel__score king-health-panel__score--${
+                overallHealth >= 80
+                  ? "good"
+                  : overallHealth >= 40
+                    ? "warn"
+                    : "critical"
+              }`}
+            >
+              {overallHealth}% Operativo
+            </div>
+          </div>
+          <div className="king-health-grid">
+            <HealthChip integration={health.ollama} icon={<Cpu size={16} />} />
+            <HealthChip
+              integration={health.binance}
+              icon={<Shield size={16} />}
+            />
+            <HealthChip
+              integration={health.near}
+              icon={<Globe2 size={16} />}
+            />
+            <HealthChip
+              integration={health.telegram}
+              icon={<Zap size={16} />}
+            />
+            <HealthChip
+              integration={health.twitter}
+              icon={<Sparkles size={16} />}
+            />
+            <HealthChip
+              integration={health.gumroad}
+              icon={<Package size={16} />}
+            />
+          </div>
+        </motion.div>
+      )}
 
       {/* ═══ METRICS ROW ═══ */}
       <motion.div
@@ -198,25 +303,33 @@ export default function KingAgentDashboard() {
           icon={<Wallet size={18} />}
           label="Balance Vivo"
           value={`$${balance.toFixed(2)}`}
-          sub="Binance + NEAR"
+          sub={`Binance: $${binanceBal.toFixed(2)} | NEAR: $${nearBal.toFixed(2)}`}
           color="emerald"
           delay={0.1}
         />
         <MetricCard
           icon={<TrendingUp size={18} />}
-          label="Total Barrido"
-          value={`$${totalSwept.toFixed(2)}`}
-          sub="Acumulado histórico"
+          label="Ingresos Reales"
+          value={`$${totalRealSwept.toFixed(2)}`}
+          sub="Solo transacciones verificadas"
           color="amber"
           delay={0.15}
+        />
+        <MetricCard
+          icon={<DollarSign size={18} />}
+          label="Paper Trading P&L"
+          value={`$${totalPaperProfit.toFixed(2)}`}
+          sub="Kelly Criterion simulado"
+          color="indigo"
+          delay={0.2}
         />
         <MetricCard
           icon={<Globe2 size={18} />}
           label="NEAR/USD"
           value={nearPrice > 0 ? `$${nearPrice.toFixed(4)}` : "—"}
           sub="CoinGecko Live"
-          color="indigo"
-          delay={0.2}
+          color="purple"
+          delay={0.22}
         />
         <MetricCard
           icon={<BarChart3 size={18} />}
@@ -249,7 +362,22 @@ export default function KingAgentDashboard() {
               </span>
               <span className="king-vault__tag">REAL</span>
             </div>
-            <p className="king-vault__source">AgentKit NEAR + Binance Spot</p>
+            <div className="king-vault__breakdown">
+              <div className="king-vault__breakdown-item">
+                <Shield size={12} className="text-amber" />
+                <span>Binance Spot</span>
+                <span className="king-vault__breakdown-val">
+                  ${binanceBal.toFixed(2)}
+                </span>
+              </div>
+              <div className="king-vault__breakdown-item">
+                <Globe2 size={12} className="text-indigo" />
+                <span>NEAR On-Chain</span>
+                <span className="king-vault__breakdown-val">
+                  ${nearBal.toFixed(2)}
+                </span>
+              </div>
+            </div>
 
             {/* Sweep Progress */}
             <div className="king-sweep">
@@ -295,32 +423,38 @@ export default function KingAgentDashboard() {
               <IntegrationChip
                 icon={<Globe2 size={20} />}
                 name="NEAR"
-                status="Protocolo"
+                status={health?.near?.status ?? "MISSING_KEYS"}
                 color="emerald"
               />
               <IntegrationChip
                 icon={<Shield size={20} />}
                 name="Binance"
-                status="Core API"
+                status={health?.binance?.status ?? "MISSING_KEYS"}
                 color="amber"
               />
               <IntegrationChip
                 icon={<Package size={20} />}
                 name="Gumroad"
-                status="Productos"
+                status={health?.gumroad?.status ?? "MISSING_KEYS"}
                 color="purple"
               />
               <IntegrationChip
                 icon={<Sparkles size={20} />}
                 name="Twitter/X"
-                status="Social"
+                status={health?.twitter?.status ?? "MISSING_KEYS"}
                 color="sky"
               />
             </div>
             <div className="king-integrations__neural">
               <Cpu size={18} className="text-indigo" />
-              <span>Neural Memory (15yr S&P/FX)</span>
-              <span className="king-integrations__active">ACTIVE</span>
+              <span>Ollama LLM (Llama3)</span>
+              <span
+                className={`king-integrations__active king-integrations__active--${health?.ollama?.status === "CONNECTED" ? "live" : "dead"}`}
+              >
+                {health?.ollama?.status === "CONNECTED"
+                  ? "ACTIVE"
+                  : "OFFLINE"}
+              </span>
             </div>
           </motion.div>
 
@@ -407,6 +541,13 @@ export default function KingAgentDashboard() {
               >
                 <TrendingUp size={12} /> Sweeps
               </button>
+              <button
+                className={`king-tab ${activeTab === "paper" ? "king-tab--active" : ""}`}
+                id="king-tab-paper"
+                onClick={() => setActiveTab("paper")}
+              >
+                <BarChart3 size={12} /> Paper P&L
+              </button>
             </div>
 
             {/* Tab Content */}
@@ -422,7 +563,10 @@ export default function KingAgentDashboard() {
                   >
                     {data?.telemetry && data.telemetry.length > 0 ? (
                       data.telemetry.map((t, i) => (
-                        <TelemetryRow key={`${t.cycleId}-${t.phase}-${i}`} entry={t} />
+                        <TelemetryRow
+                          key={`${t.cycleId}-${t.phase}-${i}`}
+                          entry={t}
+                        />
                       ))
                     ) : (
                       <EmptyState
@@ -488,12 +632,64 @@ export default function KingAgentDashboard() {
                               {new Date(s.time).toLocaleString("es-CO")}
                             </span>
                           </div>
+                          <span className="king-sweep-entry__badge-real">
+                            VERIFICADO
+                          </span>
                         </div>
                       ))
                     ) : (
                       <EmptyState
                         loading={false}
-                        msg="Sin sweeps ejecutados aún. Balance debe superar $100."
+                        msg="Sin sweeps reales ejecutados. Balance debe superar $100 con credenciales activas."
+                      />
+                    )}
+                  </motion.div>
+                )}
+
+                {activeTab === "paper" && (
+                  <motion.div
+                    key="paper"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="king-terminal__entries"
+                  >
+                    <div className="king-paper-header">
+                      <BarChart3 size={14} className="text-indigo" />
+                      <span>
+                        Paper Trading Total: $
+                        {totalPaperProfit.toFixed(2)} USD
+                      </span>
+                      <span className="king-paper-header__badge">
+                        SIMULADO
+                      </span>
+                    </div>
+                    {data?.paperTrades && data.paperTrades.length > 0 ? (
+                      data.paperTrades.map((p, i) => (
+                        <div
+                          key={`paper-${i}`}
+                          className="king-paper-entry"
+                        >
+                          <div className="king-paper-entry__icon">
+                            <DollarSign size={14} />
+                          </div>
+                          <div className="king-paper-entry__detail">
+                            <span className="king-paper-entry__amount">
+                              +${p.amount.toFixed(2)} USD
+                            </span>
+                            <span className="king-paper-entry__time">
+                              {new Date(p.time).toLocaleString("es-CO")}
+                            </span>
+                          </div>
+                          <span className="king-paper-entry__badge">
+                            PAPER
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <EmptyState
+                        loading={false}
+                        msg="Sin operaciones de arbitraje en papel aún."
                       />
                     )}
                   </motion.div>
@@ -560,11 +756,50 @@ function IntegrationChip({
   status: string;
   color: string;
 }) {
+  const isConnected = status === "CONNECTED";
   return (
-    <div className={`king-chip king-chip--${color}`}>
+    <div
+      className={`king-chip king-chip--${color} ${!isConnected ? "king-chip--dim" : ""}`}
+    >
       {icon}
       <span className="king-chip__name">{name}</span>
-      <span className={`king-chip__status text-${color}`}>{status}</span>
+      <span
+        className={`king-chip__status ${isConnected ? `text-${color}` : "text-red"}`}
+      >
+        {isConnected ? "Conectado" : "Sin Claves"}
+      </span>
+    </div>
+  );
+}
+
+function HealthChip({
+  integration,
+  icon,
+}: {
+  integration: IntegrationHealth;
+  icon: React.ReactNode;
+}) {
+  const statusIcon =
+    integration.status === "CONNECTED" ? (
+      <CheckCircle2 size={12} className="text-emerald" />
+    ) : integration.status === "MISSING_KEYS" ? (
+      <AlertTriangle size={12} className="text-amber" />
+    ) : (
+      <XCircle size={12} className="text-red" />
+    );
+
+  return (
+    <div
+      className={`king-health-chip king-health-chip--${integration.status.toLowerCase()}`}
+    >
+      <div className="king-health-chip__icon">{icon}</div>
+      <div className="king-health-chip__body">
+        <div className="king-health-chip__name-row">
+          <span className="king-health-chip__name">{integration.name}</span>
+          {statusIcon}
+        </div>
+        <span className="king-health-chip__detail">{integration.detail}</span>
+      </div>
     </div>
   );
 }
@@ -580,7 +815,9 @@ function TelemetryRow({ entry }: { entry: TelemetryEntry }) {
     );
 
   return (
-    <div className={`king-telemetry-row king-telemetry-row--${entry.status.toLowerCase()}`}>
+    <div
+      className={`king-telemetry-row king-telemetry-row--${entry.status.toLowerCase()}`}
+    >
       <div className="king-telemetry-row__icon">{statusIcon}</div>
       <div className="king-telemetry-row__body">
         <div className="king-telemetry-row__header">
@@ -602,7 +839,7 @@ function EmptyState({ loading, msg }: { loading: boolean; msg: string }) {
       {loading ? (
         <Loader2 size={20} className="animate-spin" />
       ) : (
-        <Cpu size={20} />
+        <ServerCrash size={20} />
       )}
       <span>{msg}</span>
     </div>

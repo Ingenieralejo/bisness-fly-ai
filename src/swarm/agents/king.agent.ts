@@ -39,6 +39,23 @@ interface DigitalProduct {
   category: string;
 }
 
+export interface IntegrationHealth {
+  name: string;
+  status: 'CONNECTED' | 'MISSING_KEYS' | 'UNREACHABLE';
+  detail: string;
+}
+
+export interface KingHealthReport {
+  ollama: IntegrationHealth;
+  binance: IntegrationHealth;
+  near: IntegrationHealth;
+  telegram: IntegrationHealth;
+  twitter: IntegrationHealth;
+  gumroad: IntegrationHealth;
+  overallScore: number;
+  checkedAt: Date;
+}
+
 /**
  * ═══════════════════════════════════════════════════════════
  *  THE KING AGENT — 👑 GOD LEVEL v2.0 👑
@@ -499,12 +516,13 @@ Return ONLY valid JSON. No markdown, no explanation.`;
       }
     }
 
-    // Deterministic fallback hash — confirms intent was processed
+    // No keys or vault address → sweep cannot proceed. Do NOT fake success.
+    this.logger.warn('⚠️ SWEEP ABORTED: Missing Binance keys or OFFLINE_VAULT_ADDRESS. Configure .env and run seed-vault.');
     return {
-      success: true,
-      txHash: cryptoHelper.randomBytes(32).toString('hex'),
-      amount,
-      network: 'MATRIX_FALLBACK',
+      success: false,
+      txHash: 'SWEEP_BLOCKED_NO_CREDENTIALS',
+      amount: 0,
+      network: 'NONE',
     };
   }
 
@@ -592,16 +610,118 @@ Return ONLY valid JSON. No markdown, no explanation.`;
   }
 
   // ═══════════════════════════════════════════════════════════
+  //  HEALTH DIAGNOSTICS (Integration Status)
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * Runs a comprehensive check of all integrations KING depends on.
+   * Returns a typed health report consumed by the dashboard.
+   */
+  async getHealthReport(): Promise<KingHealthReport> {
+    const checks = await Promise.allSettled([
+      this.checkOllama(),
+      this.checkBinanceVault(),
+      this.checkNearConfig(),
+      this.checkTelegramBot(),
+      this.checkTwitterApi(),
+      this.checkGumroadApi(),
+    ]);
+
+    const resolved = (idx: number): IntegrationHealth => {
+      const result = checks[idx];
+      if (result && result.status === 'fulfilled') return result.value;
+      return { name: 'Unknown', status: 'UNREACHABLE', detail: 'Check failed unexpectedly' };
+    };
+
+    const report: KingHealthReport = {
+      ollama: resolved(0),
+      binance: resolved(1),
+      near: resolved(2),
+      telegram: resolved(3),
+      twitter: resolved(4),
+      gumroad: resolved(5),
+      overallScore: 0,
+      checkedAt: new Date(),
+    };
+
+    const all = [report.ollama, report.binance, report.near, report.telegram, report.twitter, report.gumroad];
+    report.overallScore = Math.round((all.filter(i => i.status === 'CONNECTED').length / all.length) * 100);
+
+    return report;
+  }
+
+  private async checkOllama(): Promise<IntegrationHealth> {
+    try {
+      const res = await axios.get('http://localhost:11434/api/tags', { timeout: 3000 });
+      const models = res.data?.models ?? [];
+      const hasLlama = models.some((m: { name: string }) => m.name.includes('llama'));
+      return {
+        name: 'Ollama LLM',
+        status: hasLlama ? 'CONNECTED' : 'MISSING_KEYS',
+        detail: hasLlama ? `${models.length} model(s) loaded` : 'Ollama running but no llama3 model found (run: ollama pull llama3:8b)',
+      };
+    } catch {
+      return { name: 'Ollama LLM', status: 'UNREACHABLE', detail: 'Ollama not running on localhost:11434' };
+    }
+  }
+
+  private async checkBinanceVault(): Promise<IntegrationHealth> {
+    const vault = await this.prisma.vaultCredential.findFirst({ where: { type: 'BINANCE_LIVE' } });
+    if (!vault?.metadata) return { name: 'Binance CEX', status: 'MISSING_KEYS', detail: 'No BINANCE_LIVE credential in vault. Run: npx ts-node scripts/seed-vault.ts' };
+    const keys: BinanceKeys = JSON.parse(vault.metadata);
+    if (!keys.apiKey || !keys.apiSecret) return { name: 'Binance CEX', status: 'MISSING_KEYS', detail: 'API key or secret is empty in vault' };
+    return { name: 'Binance CEX', status: 'CONNECTED', detail: `API Key: ${keys.apiKey.substring(0, 8)}...` };
+  }
+
+  private async checkNearConfig(): Promise<IntegrationHealth> {
+    const wallet = process.env['AGENTKIT_WALLET_ADDRESS'];
+    if (!wallet) return { name: 'NEAR Protocol', status: 'MISSING_KEYS', detail: 'AGENTKIT_WALLET_ADDRESS not set in .env' };
+    return { name: 'NEAR Protocol', status: 'CONNECTED', detail: `Wallet: ${wallet.substring(0, 12)}...` };
+  }
+
+  private async checkTelegramBot(): Promise<IntegrationHealth> {
+    const token = process.env['TELEGRAM_BOT_TOKEN'];
+    if (!token) return { name: 'Telegram Bot', status: 'MISSING_KEYS', detail: 'TELEGRAM_BOT_TOKEN not set in .env' };
+    try {
+      const res = await axios.get(`https://api.telegram.org/bot${token}/getMe`, { timeout: 4000 });
+      if (res.data?.ok) return { name: 'Telegram Bot', status: 'CONNECTED', detail: `Bot: @${res.data.result.username}` };
+    } catch { /* fall through */ }
+    return { name: 'Telegram Bot', status: 'UNREACHABLE', detail: 'Token exists but API returned error' };
+  }
+
+  private async checkTwitterApi(): Promise<IntegrationHealth> {
+    const vault = await this.prisma.vaultCredential.findFirst({ where: { type: 'TWITTER_API' } });
+    if (!vault?.metadata) return { name: 'Twitter/X', status: 'MISSING_KEYS', detail: 'No TWITTER_API credential in vault' };
+    const keys = JSON.parse(vault.metadata);
+    if (!keys.bearerToken) return { name: 'Twitter/X', status: 'MISSING_KEYS', detail: 'Bearer token is empty' };
+    return { name: 'Twitter/X', status: 'CONNECTED', detail: `Bearer: ${keys.bearerToken.substring(0, 12)}...` };
+  }
+
+  private async checkGumroadApi(): Promise<IntegrationHealth> {
+    const vault = await this.prisma.vaultCredential.findFirst({ where: { type: 'GUMROAD_API' } });
+    if (!vault?.metadata) return { name: 'Gumroad', status: 'MISSING_KEYS', detail: 'No GUMROAD_API credential in vault' };
+    const keys = JSON.parse(vault.metadata);
+    if (!keys.accessToken) return { name: 'Gumroad', status: 'MISSING_KEYS', detail: 'Access token is empty' };
+    return { name: 'Gumroad', status: 'CONNECTED', detail: `Token: ${keys.accessToken.substring(0, 10)}...` };
+  }
+
+  // ═══════════════════════════════════════════════════════════
   //  PUBLIC STATUS (API Endpoint Data)
   // ═══════════════════════════════════════════════════════════
 
   /**
    * Returns full agent status for the dashboard API endpoint.
+   * Includes health diagnostics, real vs paper revenue split, and full telemetry.
    */
   async getFullStatus() {
-    const [sweepEvents, signals, telemetry, products] = await Promise.all([
+    const [sweepEvents, paperEvents, signals, telemetry, products, health] = await Promise.all([
       this.prisma.revenueEvent.findMany({
-        where: { channel: 'KING_GOD_LEVEL' },
+        where: { channel: 'KING_GOD_LEVEL', source: { not: 'PAPER_ARBITRAGE' } },
+        orderBy: { occurredAt: 'desc' },
+        take: 20,
+      }),
+      this.prisma.revenueEvent.findMany({
+        where: { channel: 'KING_GOD_LEVEL', source: 'PAPER_ARBITRAGE' },
         orderBy: { occurredAt: 'desc' },
         take: 20,
       }),
@@ -620,9 +740,14 @@ Return ONLY valid JSON. No markdown, no explanation.`;
         orderBy: { createdAt: 'desc' },
         take: 5,
       }),
+      this.getHealthReport(),
     ]);
 
-    const totalSwept = sweepEvents.reduce(
+    const totalRealSwept = sweepEvents.reduce(
+      (acc: number, ev: { amount: number }) => acc + (ev.amount || 0),
+      0,
+    );
+    const totalPaperProfit = paperEvents.reduce(
       (acc: number, ev: { amount: number }) => acc + (ev.amount || 0),
       0,
     );
@@ -634,10 +759,14 @@ Return ONLY valid JSON. No markdown, no explanation.`;
     });
 
     let liveBalance = 0;
+    let binanceBalance = 0;
+    let nearBalance = 0;
     if (latestSnapshot?.data) {
       try {
         const parsed = JSON.parse(latestSnapshot.data);
         liveBalance = parsed.total ?? 0;
+        binanceBalance = parsed.binance ?? 0;
+        nearBalance = parsed.near ?? 0;
       } catch {
         // ignore parse errors
       }
@@ -645,11 +774,16 @@ Return ONLY valid JSON. No markdown, no explanation.`;
 
     return {
       balance: liveBalance,
-      totalSwept,
+      binanceBalance,
+      nearBalance,
+      totalRealSwept,
+      totalPaperProfit,
+      totalSwept: totalRealSwept, // backward compat
       threshold: this.SWEEP_THRESHOLD_USD,
       nearPrice: this.cachedNearPrice,
       cycleCount: this.cycleCount,
       currentCycleId: this.currentCycleId,
+      health,
       logs: signals.map((s: { type: string; data: string | null; createdAt: Date }) => ({
         type: s.type,
         data: s.data,
@@ -665,6 +799,11 @@ Return ONLY valid JSON. No markdown, no explanation.`;
         return { ...parsed, type: t.type, time: t.createdAt };
       }),
       sweepHistory: sweepEvents.map((e: { amount: number; metadata: string | null; occurredAt: Date }) => ({
+        amount: e.amount,
+        metadata: e.metadata,
+        time: e.occurredAt,
+      })),
+      paperTrades: paperEvents.map((e: { amount: number; metadata: string | null; occurredAt: Date }) => ({
         amount: e.amount,
         metadata: e.metadata,
         time: e.occurredAt,
