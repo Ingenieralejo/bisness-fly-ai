@@ -12,6 +12,7 @@ import { OutreachEngineService } from '../engines/outreach-engine.service';
 import { ModuleRoiService } from '../engines/module-roi.service';
 import { DecisionEngineService } from '../engines/decision-engine.service';
 import { LocalModelService } from '../llm/local-model.service';
+import { KnowledgeInjectionService } from '../knowledge/knowledge-injection.service';
 
 // Ops Agents (Execution Layer)
 import { MarketScannerAgent } from './agents/market-scanner.agent';
@@ -23,6 +24,7 @@ import { BusinessClonerAgent } from './agents/clusters/cloner.agent';
 import { PaymentsAgent } from './agents/payments/payments.agent';
 import { TelegramAgent } from './agents/notifications/telegram.agent';
 import { RevenueSniperAgent } from './agents/revenue-sniper.agent';
+import { KingAgent } from './agents/king.agent';
 
 @Module({
   imports: [PrismaModule],
@@ -38,6 +40,7 @@ import { RevenueSniperAgent } from './agents/revenue-sniper.agent';
     ModuleRoiService,
     DecisionEngineService,
     LocalModelService,
+    KnowledgeInjectionService,
     // Ops Agents
     MarketScannerAgent,
     LeadHunterAgent,
@@ -48,6 +51,7 @@ import { RevenueSniperAgent } from './agents/revenue-sniper.agent';
     PaymentsAgent,
     TelegramAgent,
     RevenueSniperAgent,
+    KingAgent,
   ],
   exports: [
     SwarmOrchestrator,
@@ -59,6 +63,7 @@ import { RevenueSniperAgent } from './agents/revenue-sniper.agent';
     PaymentsAgent,
     TelegramAgent,
     RevenueSniperAgent,
+    KingAgent,
   ],
 })
 export class NeuralSwarmModule {}

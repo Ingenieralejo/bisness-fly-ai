@@ -17,5 +17,6 @@
     "skipLibCheck": true,
     "strict": true
   },
-  "exclude": ["frontend", "node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["frontend", "node_modules", "dist", "tmp", "scripts"]
 }

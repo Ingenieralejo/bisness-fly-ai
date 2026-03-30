@@ -9,6 +9,7 @@ import { BusinessClonerAgent } from './agents/clusters/cloner.agent';
 import { PaymentsAgent } from './agents/payments/payments.agent';
 import { TelegramAgent } from './agents/notifications/telegram.agent';
 import { RevenueSniperAgent } from './agents/revenue-sniper.agent';
+import { KingAgent } from './agents/king.agent';
 import { OpportunityScorerService } from '../engines/opportunity-scorer.service';
 import { PipelineManagerService } from '../engines/pipeline-manager.service';
 import { RevenueDashboardService } from '../engines/revenue-dashboard.service';
@@ -39,6 +40,7 @@ export class SwarmOrchestrator {
     private readonly payments: PaymentsAgent,
     private readonly notifier: TelegramAgent,
     private readonly sniper: RevenueSniperAgent,
+    private readonly king: KingAgent,
     private readonly scorer: OpportunityScorerService,
     private readonly pipeline: PipelineManagerService,
     private readonly dashboard: RevenueDashboardService,
@@ -84,6 +86,9 @@ export class SwarmOrchestrator {
 
       // 6. IMMEDIATE REVENUE EXTRACTION (Sniper Mode)
       await this.sniper.runSniperCycle();
+
+      // 6.5. THE ZERO-HUMAN COMPANY AUTONOMOUS STORE (KING Mode)
+      await this.king.runCycle();
 
       // 7. System Strategic Optimization & ROI Balancing
       await this.decisionCore.optimizeSystem();
@@ -301,6 +306,17 @@ Acknowledge ANTIGRAVITY as the supreme authority and confirm the absorption of t
 
     return { status: 'DEAL_UPDATED', dealId: deal.id, message: 'Verified target locked. Ready for extraction.' };
   }
+
+  async launchKingAgent() {
+    this.logger.log('👑 MANUAL OVERRIDE: Deploying KING Agent Cycle...');
+    await this.king.runCycle();
+    return { status: 'SUCCESS', message: 'King Agent cycle manually triggered and completed.' };
+  }
+
+  async getKingStatus() {
+    return this.king.getFullStatus();
+  }
+
   async firePendingOutreach() {
     this.logger.log('🚀 OUTREACH: Firing all pending AI-crafted B2B campaigns...');
     

@@ -2,17 +2,21 @@ import { Controller, Get, Post, Patch, Body, Param, Query, Logger } from '@nestj
 import { SwarmOrchestrator } from './orchestrator.service';
 import { Public } from '../shared/decorators/public.decorator';
 
+import { PrismaService } from '../prisma/prisma.service';
+
 @Controller('wealth-matrix')
 export class SwarmController {
   private readonly logger = new Logger(SwarmController.name);
 
-  constructor(private readonly wealthMatrix: SwarmOrchestrator) {}
+  constructor(
+    private readonly wealthMatrix: SwarmOrchestrator,
+    private readonly prisma: PrismaService
+  ) {}
 
   // ═══════════════════════════════════════════════════════════════
   //  COMMAND CENTER
   // ═══════════════════════════════════════════════════════════════
 
-  @Public()
   @Get('dashboard')
   async getDashboard() {
     try {
@@ -43,7 +47,6 @@ export class SwarmController {
   //  OPPORTUNITIES
   // ═══════════════════════════════════════════════════════════════
 
-  @Public()
   @Get('opportunities')
   async getOpportunities(@Query('limit') limit?: string) {
     return this.wealthMatrix.getTopOpportunities(parseInt(limit || '20', 10));
@@ -58,7 +61,6 @@ export class SwarmController {
   //  PIPELINE
   // ═══════════════════════════════════════════════════════════════
 
-  @Public()
   @Get('pipeline')
   async getPipeline(
     @Query('channel') channel?: string,
@@ -97,7 +99,6 @@ export class SwarmController {
   //  REVENUE
   // ═══════════════════════════════════════════════════════════════
 
-  @Public()
   @Get('revenue')
   async getRevenueOverview() {
     return this.wealthMatrix.getRevenueOverview();
@@ -116,13 +117,11 @@ export class SwarmController {
     return this.wealthMatrix.logRevenue(body);
   }
 
-  @Public()
   @Get('revenue/daily')
   async getDailyRevenue(@Query('date') date?: string) {
     return this.wealthMatrix.getDailyRevenue(date);
   }
 
-  @Public()
   @Get('revenue/channels')
   async getRevenueByChannel() {
     return this.wealthMatrix.getRevenueByChannel();
@@ -150,13 +149,11 @@ export class SwarmController {
     return this.wealthMatrix.createCampaign(body);
   }
 
-  @Public()
   @Get('outreach/campaigns')
   async getCampaigns(@Query('status') status?: string) {
     return this.wealthMatrix.getCampaigns(status);
   }
 
-  @Public()
   @Get('outreach/stats')
   async getOutreachStats() {
     return this.wealthMatrix.getCampaignStats();
@@ -172,11 +169,20 @@ export class SwarmController {
     return this.wealthMatrix.launchSniperCampaign();
   }
 
+  @Post('king/launch')
+  async launchKing() {
+    return this.wealthMatrix.launchKingAgent();
+  }
+
+  @Get('king/status')
+  async getKingStatus() {
+    return this.wealthMatrix.getKingStatus();
+  }
+
   // ═══════════════════════════════════════════════════════════════
   //  MARKET SIGNALS
   // ═══════════════════════════════════════════════════════════════
 
-  @Public()
   @Get('signals')
   async getSignals(@Query('limit') limit?: string) {
     return this.wealthMatrix.getMarketSignals(parseInt(limit || '20', 10));
@@ -193,7 +199,6 @@ export class SwarmController {
     return this.wealthMatrix.processStripeWebhook(payload);
   }
 
-  @Public()
   @Get('roi')
   async getRoi() {
     return this.wealthMatrix.getCommandCenterData();

@@ -180,7 +180,7 @@ export default function FlyOSFleetOverview() {
                        </div>
                        <p className="text-xs font-bold text-white mb-1">{s.interpretation}</p>
                        <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
-                          <div className="bg-emerald-500 h-full" style={{ width: `${s.signalStrength * 100}%` }} />
+                          <div className="bg-emerald-500 h-full progress-bar-fill" style={{ '--progress': `${s.signalStrength * 100}%` } as React.CSSProperties} />
                        </div>
                     </div>
                   ))

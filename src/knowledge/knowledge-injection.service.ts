@@ -58,4 +58,26 @@ export class KnowledgeInjectionService {
       - ZERO-MARGINAL COST: Deploy digital assets (software, content, AI agents) where the cost of replication is zero. Infinite scalability.
     `;
   }
+
+  /**
+   * Unified Context Injection — Aggregates domain-specific knowledge
+   * into a single compressed context string for agent consumption.
+   * @param domain - Knowledge domain key (TRADING_AND_MACRO, ACCOUNTING, BUSINESS_MODELS, FULL)
+   */
+  async injectContext(domain: string): Promise<string> {
+    this.logger.log(`🧬 KNOWLEDGE INJECTOR: Loading domain [${domain}]...`);
+
+    const contextMap: Record<string, () => string> = {
+      TRADING_AND_MACRO: () => `${this.getMarketMemory()}\n\n${this.getAdvancedMath()}`,
+      ACCOUNTING: () => this.getAccountingLogic(),
+      BUSINESS_MODELS: () => this.getBusinessModelsIntelligence(),
+      FULL: () => `${this.getMarketMemory()}\n${this.getAdvancedMath()}\n${this.getAccountingLogic()}\n${this.getBusinessModelsIntelligence()}`,
+    };
+
+    const resolver = contextMap[domain] ?? contextMap['FULL'];
+    const context = resolver();
+
+    this.logger.log(`🧬 KNOWLEDGE INJECTOR: Delivered ${context.length} chars for domain [${domain}].`);
+    return context;
+  }
 }

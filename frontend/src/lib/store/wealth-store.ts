@@ -38,7 +38,8 @@ export const useWealthStore = create<WealthState>()(
         { id: '7', name: 'Affiliate Scaling', slug: 'affiliate', category: 'FINANCIAL', status: 'HUNTING', revenue: 0, potential: 10000, icon: '🔗', description: 'Enterprise Software Distribution', payout: 'BANCOLOMBIA' },
         { id: '8', name: 'B2B Lead Scraping', slug: 'b2b-leads', category: 'B2B', status: 'ACTIVE', revenue: 0, potential: 6000, icon: '🛰️', description: 'Verified Corporate Data Mining', payout: 'STRIPE' },
         { id: '9', name: 'Social Media Bot', slug: 'social-bot', category: 'DIGITAL', status: 'SCALING', revenue: 0, potential: 3000, icon: '📱', description: 'Automated Sales Content Generator', payout: 'PAYPAL' },
-        { id: '10', name: 'RAG-as-a-Service', slug: 'raas', category: 'B2B', status: 'ACTIVE', revenue: 0, potential: 25000, icon: '🧠', description: 'Industrial Intelligence Subscription', payout: 'BANCOLOMBIA' }
+        { id: '10', name: 'RAG-as-a-Service', slug: 'raas', category: 'B2B', status: 'ACTIVE', revenue: 0, potential: 25000, icon: '🧠', description: 'Industrial Intelligence Subscription', payout: 'BANCOLOMBIA' },
+        { id: '11', name: 'KING Autonomous AI', slug: 'king', category: 'TRADING', status: 'ACTIVE', revenue: 105.50, potential: 250000, icon: '👑', description: 'Zero-Human Digital Products (AgentKit / NEAR)', payout: 'BINANCE' }
       ] as BizModel[],
       globalRevenue: 0,
       activeLeads: 0,

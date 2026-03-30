@@ -19,10 +19,10 @@ export class LocalModelService {
   }
 
   /**
-   * Execute a task using a worker agent (The Swarm - Phi 3)
+   * Execute a task using a worker agent (Unified to Llama 3)
    */
   async executeTask(prompt: string, context = ''): Promise<string> {
-    return this.generate('phi3', prompt, context);
+    return this.generate('llama3:8b', prompt, context);
   }
 
   /**
