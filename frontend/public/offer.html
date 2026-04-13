@@ -1,523 +1,591 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FLY.AI Studio — Enterprise-Grade UI Templates | Next.js 15 + Framer Motion</title>
-  <meta name="description" content="Production-ready enterprise UI templates built with Next.js 15, TypeScript, Framer Motion & Tailwind CSS. Security vaults, legal AI scanners, CRM systems, and wealth dashboards. Download source code instantly." />
-  <meta name="keywords" content="Next.js templates, enterprise UI, React components, Framer Motion, TypeScript, Tailwind CSS, admin dashboard, security vault, CRM, SaaS template" />
-  <meta property="og:title" content="FLY.AI Studio — Enterprise UI Templates" />
-  <meta property="og:description" content="4 production-grade Next.js 15 templates. Download source code. Built by elite architects." />
-  <meta property="og:type" content="website" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The 1% AI Engineering Elite | Autonomous Systems</title>
+  
+  <!-- Elite Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;700;800;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- GSAP & Lenis for Elite Scrolling -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+  
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
+    /* Reset & Custom Properties */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
     :root {
-      --bg-primary: #060a13;
-      --bg-card: rgba(12, 18, 32, 0.7);
-      --border-subtle: rgba(255, 255, 255, 0.06);
-      --border-hover: rgba(255, 255, 255, 0.12);
-      --text-primary: #f0f2f5;
-      --text-secondary: rgba(240, 242, 245, 0.55);
-      --text-muted: rgba(240, 242, 245, 0.3);
-      --accent-blue: #3b82f6;
-      --accent-emerald: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-violet: #8b5cf6;
-      --font-display: 'Syne', sans-serif;
-      --font-body: 'DM Sans', sans-serif;
+      --bg-dark: #030305;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent-glow: #3b82f6;
+      --accent-neon: #06b6d4;
+      --accent-purple: #8b5cf6;
+      
+      --font-display: 'Cabinet Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
     }
-
-    html { scroll-behavior: smooth; }
-
+    
     body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
       font-family: var(--font-body);
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      line-height: 1.6;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── BACKGROUND ───────────────────────────────────── */
-    .bg-mesh {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    ::selection {
+      background-color: var(--accent-purple);
+      color: #fff;
     }
-    .bg-mesh::before {
-      content: ''; position: absolute;
-      top: -20%; right: -10%; width: 800px; height: 800px;
-      background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+
+    /* Core Layout */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 4vw;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Cinematic Background Canvas */
+    #ambient-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Glassmorphism & Borders */
+    .glass-panel {
+      background: rgba(10, 10, 15, 0.4);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+    }
+
+    /* Header */
+    nav {
+      position: fixed;
+      top: 0; width: 100%;
+      padding: 24px 0;
+      z-index: 100;
+      mix-blend-mode: difference;
+    }
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .brand-core {
+      width: 12px; height: 12px;
+      background: #fff;
       border-radius: 50%;
+      box-shadow: 0 0 20px var(--accent-neon);
+      animation: corePulse 2s infinite alternate;
     }
-    .bg-mesh::after {
-      content: ''; position: absolute;
-      bottom: -15%; left: -5%; width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%);
-      border-radius: 50%;
-    }
-    .grain {
-      position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    @keyframes corePulse {
+      0% { box-shadow: 0 0 10px var(--accent-neon), 0 0 20px var(--accent-purple); transform: scale(1); }
+      100% { box-shadow: 0 0 30px var(--accent-neon), 0 0 60px var(--accent-purple); transform: scale(1.2); }
     }
 
-    /* ── LAYOUT ───────────────────────────────────────── */
-    .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 2; }
-
-    /* ── HEADER ───────────────────────────────────────── */
-    header {
-      padding: 20px 0;
-      border-bottom: 1px solid var(--border-subtle);
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(6, 10, 19, 0.85);
-      backdrop-filter: blur(20px);
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 10vh;
     }
-    .header-inner { display: flex; justify-content: space-between; align-items: center; }
-    .logo {
-      font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
-      letter-spacing: -0.02em; color: var(--text-primary);
-      display: flex; align-items: center; gap: 10px;
-    }
-    .logo-dot { width: 8px; height: 8px; background: var(--accent-blue); border-radius: 50%; }
-    .header-cta {
-      font-family: var(--font-body); font-size: 0.8rem; font-weight: 600;
-      padding: 10px 24px; border-radius: 8px;
-      background: var(--accent-blue); color: white; border: none; cursor: pointer;
-      text-decoration: none; transition: all 0.2s;
-    }
-    .header-cta:hover { background: #2563eb; transform: translateY(-1px); }
-
-    /* ── HERO ─────────────────────────────────────────── */
-    .hero { padding: 100px 0 80px; text-align: center; }
     .hero-badge {
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 16px; border-radius: 100px;
-      background: rgba(59, 130, 246, 0.08);
-      border: 1px solid rgba(59, 130, 246, 0.15);
-      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--accent-blue);
-      margin-bottom: 32px;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: var(--accent-neon);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 8px 16px;
+      border-radius: 100px;
+      margin-bottom: 2rem;
+      background: rgba(6, 182, 212, 0.05);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
-    .hero-badge-dot { width: 6px; height: 6px; background: var(--accent-emerald); border-radius: 50%; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
     .hero h1 {
-      font-family: var(--font-display); font-size: clamp(2.4rem, 5.5vw, 4rem);
-      font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;
-      margin-bottom: 24px;
-      background: linear-gradient(135deg, #f0f2f5 40%, rgba(59,130,246,0.7));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      margin-bottom: 2rem;
+      background: linear-gradient(to right, #fff 30%, #a1a1aa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      max-width: 1200px;
+      will-change: transform, opacity;
     }
     .hero p {
-      font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 40px;
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      color: var(--text-muted);
+      max-width: 700px;
+      line-height: 1.6;
+      margin-bottom: 3rem;
+      font-weight: 300;
+    }
+
+    /* Elite Identity Section */
+    .identity-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      padding: 15vh 0;
+    }
+    .identity-text h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 2rem;
+      letter-spacing: -0.02em;
+    }
+    .identity-text p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
       line-height: 1.7;
+      margin-bottom: 1.5rem;
     }
-    .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary {
-      font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
-      padding: 14px 32px; border-radius: 10px;
-      background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;
-      border: none; cursor: pointer; text-decoration: none;
-      box-shadow: 0 4px 24px rgba(59, 130, 246, 0.25);
-      transition: all 0.25s;
+    .code-block {
+      background: #09090b;
+      border: 1px solid #27272a;
+      border-radius: 16px;
+      padding: 2rem;
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      color: #10b981;
+      overflow: hidden;
+      position: relative;
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(59, 130, 246, 0.35); }
-    .btn-outline {
-      font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
-      padding: 14px 32px; border-radius: 10px;
-      background: transparent; color: var(--text-primary);
-      border: 1px solid var(--border-hover); cursor: pointer;
-      text-decoration: none; transition: all 0.25s;
-    }
-    .btn-outline:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.03); }
-
-    /* ── STATS ────────────────────────────────────────── */
-    .stats {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
-      background: var(--border-subtle); border-radius: 16px; overflow: hidden;
-      margin-bottom: 100px;
-    }
-    .stat {
-      background: var(--bg-card); padding: 32px 24px; text-align: center;
-    }
-    .stat-value {
-      font-family: var(--font-display); font-size: 1.8rem; font-weight: 800;
-      margin-bottom: 6px;
-    }
-    .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
-
-    /* ── PRODUCTS ──────────────────────────────────────── */
-    .section-title {
-      font-family: var(--font-display); font-size: 2rem; font-weight: 800;
-      letter-spacing: -0.02em; margin-bottom: 12px;
-    }
-    .section-sub { color: var(--text-secondary); font-size: 1rem; margin-bottom: 48px; max-width: 520px; }
-
-    .products { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 100px; }
-    .product-card {
-      background: var(--bg-card); border: 1px solid var(--border-subtle);
-      border-radius: 20px; overflow: hidden; transition: all 0.3s;
-      backdrop-filter: blur(10px);
-    }
-    .product-card:hover { border-color: var(--border-hover); transform: translateY(-4px); }
-
-    .product-preview {
-      height: 220px; position: relative; overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .product-preview-bg {
-      position: absolute; inset: 0;
-    }
-    .product-icon {
-      position: relative; z-index: 1; width: 56px; height: 56px;
-      border-radius: 14px; display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.1);
+    .code-block::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-neon), transparent);
+      animation: scanline 3s linear infinite;
     }
 
-    .product-body { padding: 28px; }
-    .product-tag {
-      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em;
-      text-transform: uppercase; margin-bottom: 10px; display: inline-block;
-      padding: 4px 10px; border-radius: 4px;
+    /* Products Framework */
+    .products-section {
+      padding: 10vh 0;
     }
-    .product-card h3 {
-      font-family: var(--font-display); font-size: 1.25rem; font-weight: 700;
-      margin-bottom: 10px; letter-spacing: -0.01em;
+    .section-header {
+      text-align: center;
+      margin-bottom: 5rem;
     }
-    .product-card p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; }
-
-    .product-footer { display: flex; justify-content: space-between; align-items: center; }
-    .product-price {
-      font-family: var(--font-display); font-size: 1.5rem; font-weight: 800;
+    .section-header h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
     }
-    .product-buy {
-      font-family: var(--font-body); font-size: 0.8rem; font-weight: 600;
-      padding: 10px 22px; border-radius: 8px; border: none; cursor: pointer;
-      text-decoration: none; transition: all 0.2s; color: white;
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 1rem auto 0;
     }
-    .product-buy:hover { transform: translateY(-1px); filter: brightness(1.1); }
 
-    /* ── PRODUCT COLORS ──────────────────────────────── */
-    .product-card[data-accent="blue"] .product-preview-bg { background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.02)); }
-    .product-card[data-accent="blue"] .product-icon { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
-    .product-card[data-accent="blue"] .product-tag { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
-    .product-card[data-accent="blue"] .product-price { color: var(--accent-blue); }
-    .product-card[data-accent="blue"] .product-buy { background: var(--accent-blue); }
-
-    .product-card[data-accent="emerald"] .product-preview-bg { background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.02)); }
-    .product-card[data-accent="emerald"] .product-icon { background: rgba(16,185,129,0.15); color: var(--accent-emerald); }
-    .product-card[data-accent="emerald"] .product-tag { background: rgba(16,185,129,0.1); color: var(--accent-emerald); }
-    .product-card[data-accent="emerald"] .product-price { color: var(--accent-emerald); }
-    .product-card[data-accent="emerald"] .product-buy { background: var(--accent-emerald); }
-
-    .product-card[data-accent="amber"] .product-preview-bg { background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.02)); }
-    .product-card[data-accent="amber"] .product-icon { background: rgba(245,158,11,0.15); color: var(--accent-amber); }
-    .product-card[data-accent="amber"] .product-tag { background: rgba(245,158,11,0.1); color: var(--accent-amber); }
-    .product-card[data-accent="amber"] .product-price { color: var(--accent-amber); }
-    .product-card[data-accent="amber"] .product-buy { background: var(--accent-amber); color: #1a1a1a; }
-
-    .product-card[data-accent="violet"] .product-preview-bg { background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(139,92,246,0.02)); }
-    .product-card[data-accent="violet"] .product-icon { background: rgba(139,92,246,0.15); color: var(--accent-violet); }
-    .product-card[data-accent="violet"] .product-tag { background: rgba(139,92,246,0.1); color: var(--accent-violet); }
-    .product-card[data-accent="violet"] .product-price { color: var(--accent-violet); }
-    .product-card[data-accent="violet"] .product-buy { background: var(--accent-violet); }
-
-    /* ── BUNDLE CTA ───────────────────────────────────── */
-    .bundle {
-      background: linear-gradient(135deg, rgba(59,130,246,0.06), rgba(139,92,246,0.06));
-      border: 1px solid rgba(59,130,246,0.12);
-      border-radius: 24px; padding: 56px; text-align: center; margin-bottom: 100px;
-      position: relative; overflow: hidden;
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
     }
-    .bundle::before {
+
+    .project-card {
+      position: relative;
+      padding: 4rem 3rem;
+      overflow: hidden;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.5s;
+      cursor: pointer;
+      display: flex; flex-direction: column; justify-content: space-between;
+      min-height: 480px;
+    }
+    
+    .project-card:hover {
+      transform: translateY(-10px);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .project-bg-glow {
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0;
+      transition: opacity 0.5s;
+      z-index: 0;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .project-card:hover .project-bg-glow { opacity: 0.15; }
+
+    .project-content { position: relative; z-index: 1; }
+    
+    .project-meta {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+      display: flex; gap: 1rem;
+    }
+
+    .project-title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .project-desc {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      max-width: 90%;
+    }
+
+    .btn-buy {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 1rem 2rem;
+      background: #fff;
+      color: #000;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.3s;
+      margin-top: 2rem;
+      border: none;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+    .btn-buy:hover {
+      background: var(--accent-neon);
+      color: #fff;
+      transform: scale(1.02);
+    }
+
+    /* Bundle Section */
+    .bundle-wrapper {
+      margin-top: 8rem;
+      padding: 6rem;
+      position: relative;
+      text-align: center;
+      overflow: hidden;
+    }
+    .bundle-wrapper::before {
       content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse at center, rgba(59,130,246,0.08), transparent 70%);
+      background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15), transparent 60%);
+      z-index: 0;
     }
     .bundle-content { position: relative; z-index: 1; }
-    .bundle h2 {
-      font-family: var(--font-display); font-size: 2rem; font-weight: 800;
-      margin-bottom: 12px; letter-spacing: -0.02em;
+    .bundle-price-tag {
+      font-family: var(--font-display);
+      font-size: 5rem;
+      font-weight: 900;
+      color: var(--accent-neon);
+      margin: 2rem 0;
+      letter-spacing: -0.03em;
     }
-    .bundle p { color: var(--text-secondary); margin-bottom: 8px; }
-    .bundle-price {
-      font-family: var(--font-display); font-size: 3rem; font-weight: 800;
-      color: var(--accent-blue); margin: 24px 0;
+    .bundle-old-price {
+      font-size: 2rem;
+      color: #52525b;
+      text-decoration: line-through;
+      margin-right: 1rem;
     }
-    .bundle-price span { font-size: 1rem; color: var(--text-muted); text-decoration: line-through; margin-right: 12px; }
-    .bundle-features {
-      display: flex; gap: 32px; justify-content: center; margin-bottom: 32px;
-      flex-wrap: wrap;
-    }
-    .bundle-feat {
-      font-size: 0.85rem; color: var(--text-secondary);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .bundle-feat svg { color: var(--accent-emerald); }
-
-    /* ── TECH STACK ───────────────────────────────────── */
-    .tech {
-      display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
-      margin-bottom: 100px;
-    }
-    .tech-badge {
-      padding: 10px 20px; border-radius: 10px;
-      background: var(--bg-card); border: 1px solid var(--border-subtle);
-      font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);
+    
+    .footer {
+      padding: 4rem 0;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: 10vh;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: #52525b;
     }
 
-    /* ── FOOTER ───────────────────────────────────────── */
-    footer {
-      border-top: 1px solid var(--border-subtle);
-      padding: 40px 0; text-align: center;
-      font-size: 0.75rem; color: var(--text-muted);
+    @media (max-width: 1024px) {
+      .projects-grid { grid-template-columns: 1fr; }
+      .identity-grid { grid-template-columns: 1fr; }
     }
-
-    /* ── ANIMATIONS ───────────────────────────────────── */
-    .fade-in {
-      opacity: 0; transform: translateY(24px);
-      animation: fadeIn 0.7s ease forwards;
-    }
-    .fade-in:nth-child(1) { animation-delay: 0.1s; }
-    .fade-in:nth-child(2) { animation-delay: 0.2s; }
-    .fade-in:nth-child(3) { animation-delay: 0.3s; }
-    .fade-in:nth-child(4) { animation-delay: 0.4s; }
-    @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
-
-    /* ── RESPONSIVE ───────────────────────────────────── */
     @media (max-width: 768px) {
-      .products { grid-template-columns: 1fr; }
-      .stats { grid-template-columns: repeat(2, 1fr); }
-      .hero h1 { font-size: 2rem; }
-      .bundle { padding: 32px 20px; }
-      .bundle-price { font-size: 2.2rem; }
-      .product-preview { height: 160px; }
-    }
-    @media (max-width: 480px) {
-      .stats { grid-template-columns: 1fr; }
-      .header-cta { display: none; }
+      .project-card { padding: 3rem 2rem; }
+      .bundle-wrapper { padding: 4rem 2rem; }
+      .bundle-price-tag { font-size: 3.5rem; }
     }
   </style>
 </head>
 <body>
-  <div class="bg-mesh"></div>
-  <div class="grain"></div>
+  
+  <!-- Canvas for Ambient WebGL effect (simulated with HTML5 Canvas API) -->
+  <canvas id="ambient-canvas"></canvas>
 
-  <!-- HEADER -->
-  <header>
-    <div class="container header-inner">
-      <div class="logo">
-        <div class="logo-dot"></div>
-        FLY.AI STUDIO
+  <nav>
+    <div class="container nav-inner">
+      <div class="brand">
+        <div class="brand-core"></div>
+        ANTIGRAVITY OS
       </div>
-      <a href="#products" class="header-cta">View Templates</a>
+      <div style="font-family: var(--font-code); font-size: 0.8rem; letter-spacing: 0.1em; color: var(--accent-neon);">
+        STATUS: ONLINE
+      </div>
     </div>
-  </header>
+  </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-badge fade-in">
-        <div class="hero-badge-dot"></div>
-        Production-Ready · Next.js 15 · TypeScript Strict
+  <main>
+    <section class="hero container">
+      <div class="hero-badge gs-reveal">
+        <span style="display: inline-block; width: 6px; height: 6px; background: currentColor; border-radius: 50%; box-shadow: 0 0 10px currentColor;"></span>
+        The 1% Engineering Squad
       </div>
-      <h1 class="fade-in">Enterprise UI Templates<br />Built by Elite Architects</h1>
-      <p class="fade-in">
-        4 production-grade frontend templates for fintech, legal, real estate, and CRM industries. 
-        Next.js 15, Framer Motion, Tailwind CSS. Full source code. Zero dependencies issues. Ships today.
+      <h1 class="gs-reveal">We build autonomous software, not chatbots.</h1>
+      <p class="gs-reveal">
+        The top 1% of AI implementation isn't prompt engineering. It's deterministic architecture, state machines, and rigorous backend engineering fused with LLM cognitive cores. 
+        We are elite Full-Stack Engineers deploying intelligent infrastructure meant to scale, not to simulate.
       </p>
-      <div class="hero-actions fade-in">
-        <a href="#bundle" class="btn-primary">Get the Bundle — $149</a>
-        <a href="#products" class="btn-outline">Browse Individual</a>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- STATS -->
-  <div class="container">
-    <div class="stats fade-in">
-      <div class="stat">
-        <div class="stat-value">4</div>
-        <div class="stat-label">Templates</div>
+    <section class="identity-grid container">
+      <div class="identity-text">
+        <h2 class="gs-reveal">Your Architecture is Broken. Fix it.</h2>
+        <p class="gs-reveal">El 99% de desarrolladores intentan resolver todo con un solo prompt masivo. Nosotros separamos la lógica en 4 monolitos: <strong>Intelligence Core, The Swarm, Engine Room, y Telemetry.</strong></p>
+        <p class="gs-reveal">Nuestros motores combinan el caos creativo de la IA con la dictadura militar de la Ingeniería tradicional (PostgreSQL, NestJS, FSM, Webhooks HMAC). Cero simulaciones, todo en producción.</p>
       </div>
-      <div class="stat">
-        <div class="stat-value">15.3</div>
-        <div class="stat-label">Next.js Version</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">0</div>
-        <div class="stat-label">Build Errors</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">&lt;142KB</div>
-        <div class="stat-label">First Load JS</div>
-      </div>
-    </div>
-  </div>
+      <div class="glass-panel code-block gs-reveal">
+        <pre><code style="line-height: 1.8;">
+// THE 1% DIFFERENCE ARCHITECTURE
 
-  <!-- PRODUCTS -->
-  <section id="products">
+async function AutonomousEngine() {
+  const signal = await Observer.scan(Market);
+  
+  // 1. Validation Shield (Zero Trust)
+  const schema = z.object({ target: z.string() });
+  
+  // 2. Swarm Cognitive Step
+  const intent = await LLM_Router.classify(signal);
+  
+  // 3. Deterministic Engine Exec
+  if (intent.confidence > 0.99) {
+    const trx = await DB.transaction();
+    await PaymentGateway.chargeRealRevenue(intent);
+    await trx.commit();
+  }
+}
+        </code></pre>
+      </div>
+    </section>
+
+    <section class="products-section container">
+      <div class="section-header gs-reveal">
+        <h2>Production Grade Deployments</h2>
+        <p>Acquire the absolute bleeding-edge source code. Pure Next.js 15, Strict TypeScript, Framer Motion, perfectly typed robust components.</p>
+      </div>
+
+      <div class="projects-grid">
+        
+        <!-- P1: BBVA -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow" style="background: var(--accent-neon);"></div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span style="color: var(--accent-neon);">FINTECH</span>
+              <span>SECURITY</span>
+            </div>
+            <h3 class="project-title">Neural Security Vault</h3>
+            <p class="project-desc">Tablero de biometría y seguridad cibernética grado bancario. Monitoreo de amenazas, KPIs en tiempo real y UI dark-mesh impecable.</p>
+          </div>
+          <a href="https://paypal.me/LuisMonroy76/49" class="btn-buy" target="_blank">Acquire Template — $49</a>
+        </div>
+
+        <!-- P2: Baker McKenzie -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow" style="background: var(--accent-purple);"></div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span style="color: var(--accent-purple);">LEGAL</span>
+              <span>AI SCANNER</span>
+            </div>
+            <h3 class="project-title">Legal Intelligence Engine</h3>
+            <p class="project-desc">Análisis de contratos y evaluación de riesgos corporativos con tipografía editorial (Instrument Serif) y diseño minimalista de ultra alta gama.</p>
+          </div>
+          <a href="https://paypal.me/LuisMonroy76/49" class="btn-buy" target="_blank">Acquire Template — $49</a>
+        </div>
+
+        <!-- P3: Sotheby's -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow" style="background: #fbbf24;"></div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span style="color: #fbbf24;">REAL ESTATE</span>
+              <span>WEALTH</span>
+            </div>
+            <h3 class="project-title">Wealth Management Sys</h3>
+            <p class="project-desc">Gestión de portafolios hiper-lujosos para ultra-high-net-worth individuals. Analíticas fluidas, estética brutalista refinada.</p>
+          </div>
+          <a href="https://paypal.me/LuisMonroy76/49" class="btn-buy" target="_blank">Acquire Template — $49</a>
+        </div>
+
+        <!-- P4: CRM -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow" style="background: #ef4444;"></div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span style="color: #ef4444;">SaaS</span>
+              <span>B2B CRM</span>
+            </div>
+            <h3 class="project-title">Autonomous CRM Master</h3>
+            <p class="project-desc">Sistema definitivo para seguimiento de pipelines, conversiones e integración fluida de datos para equipos de ventas masivas.</p>
+          </div>
+          <a href="https://paypal.me/LuisMonroy76/49" class="btn-buy" target="_blank">Acquire Template — $49</a>
+        </div>
+
+      </div>
+
+      <div class="glass-panel bundle-wrapper gs-reveal">
+        <h2 style="font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 800;">The Elite Matrix Bundle</h2>
+        <p style="color: var(--text-muted); font-size: 1.2rem; margin-top: 1rem;">Lleva las 4 arquitecturas empresariales. Código fuente completo. Inicia en 5 minutos.</p>
+        <div class="bundle-price-tag">
+          <span class="bundle-old-price">$196</span>$149
+        </div>
+        <a href="https://paypal.me/LuisMonroy76/149" class="btn-buy" style="font-size: 1.2rem; padding: 1.2rem 3rem;" target="_blank">Acquire Entire Stack</a>
+        <p style="margin-top: 2rem; font-family: var(--font-code); font-size: 0.8rem; color: #52525b; text-transform: uppercase;">
+          Envía el comprobante a alejandromonroy2020dijital@gmail.com
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
     <div class="container">
-      <h2 class="section-title">The Collection</h2>
-      <p class="section-sub">Each template ships with full TypeScript source, responsive layouts, Framer Motion animations, and zero build errors.</p>
-
-      <div class="products">
-        <!-- BBVA -->
-        <div class="product-card fade-in" data-accent="blue">
-          <div class="product-preview">
-            <div class="product-preview-bg"></div>
-            <div class="product-icon">🛡️</div>
-          </div>
-          <div class="product-body">
-            <div class="product-tag">Fintech · Security</div>
-            <h3>Neural Security Vault</h3>
-            <p>Enterprise-grade security dashboard with biometric login flow, live threat feed, module diagnostics, and real-time KPI monitoring. Dark cyber aesthetic.</p>
-            <div class="product-footer">
-              <div class="product-price">$49</div>
-              <a href="https://paypal.me/LuisMonroy76/49" target="_blank" rel="noopener" class="product-buy" id="buy-bbva">Buy Now →</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Baker McKenzie -->
-        <div class="product-card fade-in" data-accent="emerald">
-          <div class="product-preview">
-            <div class="product-preview-bg"></div>
-            <div class="product-icon">⚖️</div>
-          </div>
-          <div class="product-body">
-            <div class="product-tag">Legal · AI Scanner</div>
-            <h3>Legal Intelligence Engine</h3>
-            <p>AI-powered legal contract scanner with risk assessment, clause analysis, compliance tracking, and document intelligence. Instrument Serif typography.</p>
-            <div class="product-footer">
-              <div class="product-price">$49</div>
-              <a href="https://paypal.me/LuisMonroy76/49" target="_blank" rel="noopener" class="product-buy" id="buy-baker">Buy Now →</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sotheby's -->
-        <div class="product-card fade-in" data-accent="amber">
-          <div class="product-preview">
-            <div class="product-preview-bg"></div>
-            <div class="product-icon">🏛️</div>
-          </div>
-          <div class="product-body">
-            <div class="product-tag">Real Estate · Wealth</div>
-            <h3>Wealth Management Engine</h3>
-            <p>Luxury real estate portfolio dashboard with asset tracking, market analytics, investment performance, and clientele management. Premium editorial design.</p>
-            <div class="product-footer">
-              <div class="product-price">$49</div>
-              <a href="https://paypal.me/LuisMonroy76/49" target="_blank" rel="noopener" class="product-buy" id="buy-sothebys">Buy Now →</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- CRM -->
-        <div class="product-card fade-in" data-accent="violet">
-          <div class="product-preview">
-            <div class="product-preview-bg"></div>
-            <div class="product-icon">📊</div>
-          </div>
-          <div class="product-body">
-            <div class="product-tag">SaaS · CRM</div>
-            <h3>CRM Master System</h3>
-            <p>Full-featured customer relationship management with pipeline visualization, deal tracking, contact management, and team analytics. Clean modern interface.</p>
-            <div class="product-footer">
-              <div class="product-price">$49</div>
-              <a href="https://paypal.me/LuisMonroy76/49" target="_blank" rel="noopener" class="product-buy" id="buy-crm">Buy Now →</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- BUNDLE CTA -->
-  <section id="bundle">
-    <div class="container">
-      <div class="bundle">
-        <div class="bundle-content">
-          <h2 class="fade-in">Complete Bundle — All 4 Templates</h2>
-          <p class="fade-in">Save 25% when you buy the full collection. One purchase, four industries covered.</p>
-          <div class="bundle-price fade-in">
-            <span>$196</span>
-            $149
-          </div>
-          <div class="bundle-features fade-in">
-            <div class="bundle-feat">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Full source code
-            </div>
-            <div class="bundle-feat">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Next.js 15.3 + TypeScript
-            </div>
-            <div class="bundle-feat">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Framer Motion animations
-            </div>
-            <div class="bundle-feat">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Free updates
-            </div>
-            <div class="bundle-feat">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Commercial license
-            </div>
-          </div>
-          <a href="https://paypal.me/LuisMonroy76/149" target="_blank" rel="noopener" class="btn-primary" id="buy-bundle" style="font-size: 1.1rem; padding: 18px 48px;">
-            Buy Bundle — $149
-          </a>
-          <p style="margin-top: 16px; font-size: 0.75rem; color: var(--text-muted);">
-            After payment, send your receipt to <strong style="color: var(--text-secondary);">alejandromonroy2020dijital@gmail.com</strong> and receive your download link within minutes.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TECH STACK -->
-  <div class="container" style="text-align: center; margin-bottom: 20px;">
-    <p class="section-sub" style="margin: 0 auto 24px;">Built with industry-standard tools</p>
-  </div>
-  <div class="container">
-    <div class="tech">
-      <div class="tech-badge">Next.js 15.3</div>
-      <div class="tech-badge">React 19</div>
-      <div class="tech-badge">TypeScript 5</div>
-      <div class="tech-badge">Tailwind CSS 4</div>
-      <div class="tech-badge">Framer Motion 11</div>
-      <div class="tech-badge">Lucide Icons</div>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="container">
-      <p>© 2026 FLY.AI Studio. All rights reserved. Built in Medellín, Colombia.</p>
-      <p style="margin-top: 8px;">Questions? <a href="mailto:alejandromonroy2020dijital@gmail.com" style="color: var(--accent-blue); text-decoration: none;">alejandromonroy2020dijital@gmail.com</a></p>
+      &copy; 2026 ANTIGRAVITY OS v2.0 · ELITE ENGINEERING & ARCHITECTURE · ZERO SIMULATIONS
     </div>
   </footer>
 
   <script>
-    // Intersection Observer for scroll-triggered animations
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.animationPlayState = 'running';
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
+    // Initialize Lenis Smooth Scroll
+    const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
 
-    document.querySelectorAll('.fade-in').forEach(el => {
-      el.style.animationPlayState = 'paused';
-      observer.observe(el);
+    // Initialize GSAP ScrollTrigger
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Fade up animations
+    const revealElements = document.querySelectorAll('.gs-reveal');
+    revealElements.forEach((el) => {
+      gsap.fromTo(el, 
+        { autoAlpha: 0, y: 50 }, 
+        { 
+          duration: 1, 
+          autoAlpha: 1, 
+          y: 0, 
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 85%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
     });
+
+    // Custom Canvas Ambient Particle System (WebGL-like feel)
+    const canvas = document.getElementById('ambient-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let particles = [];
+    
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 2;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.speedY = Math.random() * 1 - 0.5;
+        this.opacity = Math.random() * 0.5 + 0.1;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > width) this.speedX *= -1;
+        if (this.y < 0 || this.y > height) this.speedY *= -1;
+      }
+      draw() {
+        ctx.fillStyle = `rgba(6, 182, 212, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    function initParticles() {
+      particles = [];
+      const particleCount = Math.floor((width * height) / 15000);
+      for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+    }
+    initParticles();
+    
+    function drawLines() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 120) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(139, 92, 246, ${0.1 - distance/1200})`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+    
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      drawLines();
+      requestAnimationFrame(animate);
+    }
+    animate();
   </script>
 </body>
 </html>
