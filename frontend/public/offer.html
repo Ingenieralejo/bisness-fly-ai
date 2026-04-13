@@ -344,9 +344,17 @@
 </head>
 <body>
   
-  <!-- Spaceship / Transbordador -->
-  <div id="shuttle" style="position: fixed; z-index: 50; top: -200px; right: 10vw; width: 120px; pointer-events: none; filter: drop-shadow(0 0 20px rgba(6,182,212,0.8));">
-    <img src="shuttle.png" alt="spaceship" style="width: 100%; object-fit: contain; transform: rotate(180deg);">
+  <!-- The 1% Cybernetic Shuttle (Minimalist Geometric Vector) -->
+  <div id="shuttle" style="position: fixed; z-index: 50; top: -100px; right: 15vw; width: 28px; height: 75px; pointer-events: none; filter: drop-shadow(0 0 15px rgba(6,182,212,0.9));">
+    <svg viewBox="0 0 100 200" preserveAspectRatio="none" style="width: 100%; height: 100%;">
+      <!-- Central Body -->
+      <polygon points="50,200 0,0 50,40 100,0" fill="var(--bg-dark)" stroke="var(--accent-neon)" stroke-width="2"/>
+      <!-- Right Wing Highlight (3D effect) -->
+      <polygon points="50,200 50,40 100,0" fill="rgba(6,182,212,0.15)"/>
+      <!-- Engine / Thruster Glow -->
+      <polygon points="35,30 50,0 65,30" fill="var(--accent-purple)"/>
+      <line x1="50" y1="-50" x2="50" y2="0" stroke="var(--accent-purple)" stroke-width="4" opacity="0.8"/>
+    </svg>
   </div>
 
   <!-- Canvas for Ambient WebGL effect (simulated with HTML5 Canvas API) -->
