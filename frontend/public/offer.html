@@ -658,35 +658,38 @@ async function AutonomousEngine() {
 
     class SmokeParticle {
       constructor() {
-        // Thrust originates from the absolute center of the 300px canvas (x=150)
-        this.x = 150 + (Math.random() * 20 - 10); 
+        // Tightly focused under the thrusters (3 main exhaust points)
+        const exhaustPoints = [135, 150, 165]; 
+        this.x = exhaustPoints[Math.floor(Math.random() * exhaustPoints.length)] + (Math.random() * 6 - 3); 
         this.y = 10; // Immediately abutting the engines
         
-        // Massive volumetric base size
-        this.size = Math.random() * 25 + 10;
+        // Base size, smaller for a focused flame
+        this.size = Math.random() * 10 + 5;
         
-        // Plume spreads outwards dynamically
-        this.speedX = (Math.random() - 0.5) * 6; 
-        this.speedY = Math.random() * 10 + 6; // Heavy downwards thrust
+        // Very tight horizontal spread (focused pillar of fire)
+        this.speedX = (Math.random() - 0.5) * 1.5; 
+        this.speedY = Math.random() * 12 + 8; // Extreme downwards thrust
         this.life = 1.0;
         
-        // Gradient of Plasma to Smoke
+        // Heavy realistic fire mapping (85% Flames, 15% Smoke)
         const rand = Math.random();
         if (rand > 0.90) {
-          this.color = `rgba(255, 255, 255, `; // Core Plasma
-        } else if (rand > 0.75) {
-          this.color = `rgba(14, 215, 240, `;  // Neon Cyan Afterburner
-        } else if (rand > 0.55) {
-          this.color = `rgba(180, 50, 240, `;   // Purple Ignition
+          this.color = `rgba(255, 255, 255, `; // Blinding White Core
+        } else if (rand > 0.60) {
+          this.color = `rgba(255, 200, 0, `;   // Bright Yellow Flame
+        } else if (rand > 0.25) {
+          this.color = `rgba(255, 80, 0, `;    // Intense Orange Fire
+        } else if (rand > 0.15) {
+          this.color = `rgba(220, 20, 0, `;    // Dark Red Fire Edge
         } else {
-          this.color = `rgba(100, 100, 105, `; // Deep Volumetric Smoke
+          this.color = `rgba(80, 80, 80, `;    // Thick Gray Smoke
         }
       }
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
-        this.size += 1.8; // Expand heavily to create billows
-        this.life -= 0.02; // Slower evaporation for a longer trail
+        this.size += 0.5; // Expands slowly, stays tight
+        this.life -= 0.035; // Fades faster to keep the flame short and sharp
       }
       draw() {
         // Create ultra-realistic volumetric fuzzy puff using Radial Gradients instead of flat circles
