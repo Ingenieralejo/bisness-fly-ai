@@ -345,7 +345,7 @@
 <body>
   
   <!-- The Photorealistic NASA Shuttle with Dynamic Engine -->
-  <div id="shuttle" style="position: fixed; z-index: 50; top: -500px; right: 8vw; width: 160px; pointer-events: none; mix-blend-mode: screen; display: flex; flex-direction: column; align-items: center; transform: rotate(180deg);">
+  <div id="shuttle" style="position: fixed; z-index: 50; bottom: -600px; right: 8vw; width: 160px; pointer-events: none; mix-blend-mode: screen; display: flex; flex-direction: column; align-items: center;">
     <img src="ultimate_shuttle.png" alt="Space Shuttle" style="width: 100%; object-fit: contain; z-index: 2;">
     <canvas id="smoke-canvas" width="300" height="500" style="position: absolute; top: 75%; z-index: 1; pointer-events: none; filter: blur(5px);"></canvas>
   </div>
@@ -546,19 +546,19 @@ async function AutonomousEngine() {
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
 
-    // -- SPACESHIP DIRECT MISSILE FLIGHT (TOP TO BOTTOM) --
+    // -- SPACESHIP DIRECT MISSILE FLIGHT (BOTTOM TO TOP) --
     gsap.registerPlugin(ScrollTrigger);
     
     gsap.to("#shuttle", {
-      y: document.documentElement.scrollHeight + 800, // Direct plunge down
+      y: - (document.documentElement.scrollHeight + 1000), // Direct plunge UPWARDS
       x: 0,
       scale: 1, // Keep scale consistent
-      ease: "none",
+      ease: "power1.inOut",
       scrollTrigger: {
         trigger: "body",
         start: "top top",
         end: "bottom bottom",
-        scrub: 0.5 // Direct 1-to-1 scrubbing
+        scrub: 0.8 // Direct solid scrubbing
       }
     });
 
