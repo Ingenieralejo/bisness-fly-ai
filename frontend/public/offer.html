@@ -1,278 +1,732 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FLY.AI STUDIO | 1% Engineering</title>
+  <title>The 1% AI Engineering Elite | Autonomous Systems</title>
   
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Elite Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;700;800;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   
+  <!-- GSAP & Lenis for Elite Scrolling -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
   
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            display: ['"Instrument Serif"', 'serif'],
-            sans: ['"Geist"', 'sans-serif'],
-          },
-          colors: {
-            neutral: { 950: '#0a0a0a', 900: '#171717', 800: '#262626' }
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
+    /* Reset & Custom Properties */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg-dark: #030305;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent-glow: #3b82f6;
+      --accent-neon: #06b6d4;
+      --accent-purple: #8b5cf6;
+      
+      --font-display: 'Cabinet Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+    }
+    
     body {
-      background-color: #030303;
-      color: #fafafa;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
       overflow-x: hidden;
-      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Elegant Film Grain Overlay */
-    .bg-grain {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      pointer-events: none; z-index: 50; opacity: 0.04;
-      background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+    ::selection {
+      background-color: var(--accent-purple);
+      color: #fff;
     }
 
-    /* Soft Futurism Glow */
-    .glow-orb {
-      position: absolute; border-radius: 50%; filter: blur(120px); z-index: -1;
+    /* Core Layout */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 4vw;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Cinematic Background Canvas */
+    #ambient-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Glassmorphism & Borders */
+    .glass-panel {
+      background: rgba(10, 10, 15, 0.4);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+    }
+
+    /* Header */
+    nav {
+      position: fixed;
+      top: 0; width: 100%;
+      padding: 24px 0;
+      z-index: 100;
+      mix-blend-mode: difference;
+    }
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .brand-core {
+      width: 12px; height: 12px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 20px var(--accent-neon);
+      animation: corePulse 2s infinite alternate;
+    }
+    @keyframes corePulse {
+      0% { box-shadow: 0 0 10px var(--accent-neon), 0 0 20px var(--accent-purple); transform: scale(1); }
+      100% { box-shadow: 0 0 30px var(--accent-neon), 0 0 60px var(--accent-purple); transform: scale(1.2); }
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 10vh;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: var(--accent-neon);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 8px 16px;
+      border-radius: 100px;
+      margin-bottom: 2rem;
+      background: rgba(6, 182, 212, 0.05);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      margin-bottom: 2rem;
+      background: linear-gradient(to right, #fff 30%, #a1a1aa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      max-width: 1200px;
+      will-change: transform, opacity;
+    }
+    .hero p {
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      color: var(--text-muted);
+      max-width: 700px;
+      line-height: 1.6;
+      margin-bottom: 3rem;
+      font-weight: 300;
+    }
+
+    /* Elite Identity Section */
+    .identity-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      padding: 15vh 0;
+    }
+    .identity-text h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 2rem;
+      letter-spacing: -0.02em;
+    }
+    .identity-text p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .code-block {
+      background: #09090b;
+      border: 1px solid #27272a;
+      border-radius: 16px;
+      padding: 2rem;
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      color: #10b981;
+      overflow: hidden;
+      position: relative;
+    }
+    .code-block::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-neon), transparent);
+      animation: scanline 3s linear infinite;
+    }
+
+    /* Products Framework */
+    .products-section {
+      padding: 10vh 0;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 5rem;
+    }
+    .section-header h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 1rem auto 0;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    .project-card {
+      position: relative;
+      padding: 4rem 3rem;
+      overflow: hidden;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.5s;
+      cursor: pointer;
+      display: flex; flex-direction: column; justify-content: space-between;
+      min-height: 480px;
     }
     
-    .glass-card {
-      background: rgba(25, 25, 25, 0.4);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      transition: all 0.4s ease;
+    .project-card:hover {
+      transform: translateY(-10px);
+      border-color: rgba(255,255,255,0.15);
     }
-    .glass-card:hover {
-      background: rgba(40, 40, 40, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+
+    .project-bg-glow {
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0;
+      transition: opacity 0.5s;
+      z-index: 0;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
     }
+    .project-card:hover .project-bg-glow { opacity: 0.15; }
+
+    .project-content { position: relative; z-index: 1; }
     
-    .btn-premium {
+    .project-meta {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+      display: flex; gap: 1rem;
+    }
+
+    .project-title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .project-desc {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      max-width: 90%;
+    }
+
+    .btn-buy {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 1rem 2rem;
       background: #fff;
       color: #000;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.3s;
+      margin-top: 2rem;
+      border: none;
+      cursor: pointer;
+      align-self: flex-start;
     }
-    .btn-premium:hover {
-      background: #e5e5e5;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 40px -10px rgba(255,255,255,0.3);
+    .btn-buy:hover {
+      background: var(--accent-neon);
+      color: #fff;
+      transform: scale(1.02);
     }
 
-    /* Subdued Shuttle Parallax */
-    #hero-shuttle {
-      will-change: transform;
-      mix-blend-mode: screen;
-      filter: contrast(1.1) drop-shadow(0 40px 100px rgba(255, 100, 50, 0.2));
+    /* Bundle Section */
+    .bundle-wrapper {
+      margin-top: 8rem;
+      padding: 6rem;
+      position: relative;
+      text-align: center;
+      overflow: hidden;
+    }
+    .bundle-wrapper::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15), transparent 60%);
+      z-index: 0;
+    }
+    .bundle-content { position: relative; z-index: 1; }
+    .bundle-price-tag {
+      font-family: var(--font-display);
+      font-size: 5rem;
+      font-weight: 900;
+      color: var(--accent-neon);
+      margin: 2rem 0;
+      letter-spacing: -0.03em;
+    }
+    .bundle-old-price {
+      font-size: 2rem;
+      color: #52525b;
+      text-decoration: line-through;
+      margin-right: 1rem;
+    }
+    
+    .footer {
+      padding: 4rem 0;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: 10vh;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: #52525b;
+    }
+
+    @media (max-width: 1024px) {
+      .projects-grid { grid-template-columns: 1fr; }
+      .identity-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .project-card { padding: 3rem 2rem; }
+      .bundle-wrapper { padding: 4rem 2rem; }
+      .bundle-price-tag { font-size: 3.5rem; }
     }
   </style>
 </head>
-<body class="antialiased selection:bg-zinc-800 selection:text-white">
+<body>
+  
+  <!-- The Photorealistic NASA Shuttle with Dynamic Engine -->
+  <div id="shuttle" style="position: fixed; z-index: 50; bottom: -500px; right: 5vw; width: 140px; pointer-events: none; mix-blend-mode: screen; display: flex; flex-direction: column; align-items: center;">
+    <img src="clean_shuttle.png" alt="Space Shuttle" style="width: 100%; object-fit: contain; z-index: 2;">
+    <canvas id="smoke-canvas" width="300" height="500" style="position: absolute; top: 75%; z-index: 1; pointer-events: none; filter: blur(5px);"></canvas>
+  </div>
 
-  <div class="bg-grain"></div>
+  <!-- Canvas for Ambient WebGL effect (simulated with HTML5 Canvas API) -->
+  <canvas id="ambient-canvas"></canvas>
 
-  <!-- Ambient Lighting -->
-  <div class="glow-orb w-[600px] h-[600px] bg-zinc-800/40 top-[-200px] left-[-200px]"></div>
-  <div class="glow-orb w-[800px] h-[800px] bg-zinc-900/40 bottom-[-400px] right-[-200px]"></div>
-
-  <nav class="fixed top-0 w-full z-40 border-b border-white/5 bg-black/50 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-        <span class="font-sans text-sm tracking-widest font-medium uppercase text-zinc-300">FLY.AI Studio</span>
+  <nav>
+    <div class="container nav-inner">
+      <div class="brand">
+        <div class="brand-core"></div>
+        FLY.AI STUDIO
       </div>
-      <div class="text-xs font-mono text-zinc-500 uppercase tracking-widest">
-        Top 1% Engineering
+      <div style="font-family: var(--font-code); font-size: 0.8rem; letter-spacing: 0.1em; color: var(--accent-neon);">
+        STATUS: ONLINE
       </div>
     </div>
   </nav>
 
-  <main class="relative z-10 pt-32">
-    <!-- Hero Section -->
-    <section class="max-w-7xl mx-auto px-6 min-h-[90vh] flex flex-col items-center justify-center relative">
-      <div class="text-center max-w-4xl mx-auto z-10 relative mt-20">
-        <h1 class="font-display text-7xl md:text-8xl lg:text-9xl leading-[0.9] tracking-tight mb-8">
-          Architects of <br/> <em class="text-zinc-400">Autonomy.</em>
-        </h1>
-        <p class="font-sans text-xl md:text-2xl text-zinc-400 font-light max-w-2xl mx-auto leading-relaxed mb-12">
-          We don't build prompt wrappers. We design deterministic backend infrastructure, cognitive AI swarms, and mathematical perfection.
+  <main>
+    <section class="hero container">
+      <div class="hero-badge gs-reveal">
+        <span style="display: inline-block; width: 6px; height: 6px; background: currentColor; border-radius: 50%; box-shadow: 0 0 10px currentColor;"></span>
+        The 1% Engineering Squad
+      </div>
+      <h1 class="gs-reveal">We build autonomous software, not chatbots.</h1>
+      <p class="gs-reveal">
+        The top 1% of AI implementation isn't prompt engineering. It's deterministic architecture, state machines, and rigorous backend engineering fused with LLM cognitive cores. 
+        We are elite Full-Stack Engineers deploying intelligent infrastructure meant to scale, not to simulate.
+      </p>
+    </section>
+
+    <section class="identity-grid container">
+      <div class="identity-text">
+        <h2 class="gs-reveal">Your Architecture is Broken. Fix it.</h2>
+        <p class="gs-reveal">El 99% de desarrolladores intentan resolver todo con un solo prompt masivo. Nosotros separamos la lógica en 4 monolitos: <strong>Intelligence Core, The Swarm, Engine Room, y Telemetry.</strong></p>
+        <p class="gs-reveal">Nuestros motores combinan el caos creativo de la IA con la dictadura militar de la Ingeniería tradicional (PostgreSQL, NestJS, FSM, Webhooks HMAC). Cero simulaciones, todo en producción.</p>
+      </div>
+      <div class="glass-panel code-block gs-reveal">
+        <pre><code style="line-height: 1.8;">
+// THE 1% DIFFERENCE ARCHITECTURE
+
+async function AutonomousEngine() {
+  const signal = await Observer.scan(Market);
+  
+  // 1. Validation Shield (Zero Trust)
+  const schema = z.object({ target: z.string() });
+  
+  // 2. Swarm Cognitive Step
+  const intent = await LLM_Router.classify(signal);
+  
+  // 3. Deterministic Engine Exec
+  if (intent.confidence > 0.99) {
+    const trx = await DB.transaction();
+    await PaymentGateway.chargeRealRevenue(intent);
+    await trx.commit();
+  }
+}
+        </code></pre>
+      </div>
+    </section>
+
+    <section class="products-section container">
+      <div class="section-header gs-reveal">
+        <h2>Production Grade Deployments</h2>
+        <p>Acquire the absolute bleeding-edge source code. Pure Next.js 15, Strict TypeScript, Framer Motion, perfectly typed robust components.</p>
+      </div>
+
+      <div class="projects-grid">
+        
+        <!-- P1: BBVA -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow" style="background: var(--accent-neon);"></div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span style="color: var(--accent-neon);">FINTECH</span>
+              <span>SECURITY</span>
+            </div>
+            <h3 class="project-title">Neural Security Vault</h3>
+            <p class="project-desc">Tablero de biometría y seguridad cibernética grado bancario. Monitoreo de amenazas, KPIs en tiempo real y UI dark-mesh impecable.</p>
+          </div>
+          <a href="https://paypal.me/LuisMonroy76/49" class="btn-buy" target="_blank">Acquire Template — $49</a>
+        </div>
+
+        <!-- P2: Baker McKenzie -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow" style="background: var(--accent-purple);"></div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span style="color: var(--accent-purple);">LEGAL</span>
+              <span>AI SCANNER</span>
+            </div>
+            <h3 class="project-title">Legal Intelligence Engine</h3>
+            <p class="project-desc">Análisis de contratos y evaluación de riesgos corporativos con tipografía editorial (Instrument Serif) y diseño minimalista de ultra alta gama.</p>
+          </div>
+          <a href="https://paypal.me/LuisMonroy76/49" class="btn-buy" target="_blank">Acquire Template — $49</a>
+        </div>
+
+        <!-- P3: Sotheby's -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow" style="background: #fbbf24;"></div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span style="color: #fbbf24;">REAL ESTATE</span>
+              <span>WEALTH</span>
+            </div>
+            <h3 class="project-title">Wealth Management Sys</h3>
+            <p class="project-desc">Gestión de portafolios hiper-lujosos para ultra-high-net-worth individuals. Analíticas fluidas, estética brutalista refinada.</p>
+          </div>
+          <a href="https://paypal.me/LuisMonroy76/49" class="btn-buy" target="_blank">Acquire Template — $49</a>
+        </div>
+
+        <!-- P4: CRM -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow" style="background: #ef4444;"></div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span style="color: #ef4444;">SaaS</span>
+              <span>B2B CRM</span>
+            </div>
+            <h3 class="project-title">Autonomous CRM Master</h3>
+            <p class="project-desc">Sistema definitivo para seguimiento de pipelines, conversiones e integración fluida de datos para equipos de ventas masivas.</p>
+          </div>
+          <a href="https://paypal.me/LuisMonroy76/49" class="btn-buy" target="_blank">Acquire Template — $49</a>
+        </div>
+
+      </div>
+
+      <div class="glass-panel bundle-wrapper gs-reveal">
+        <h2 style="font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 800;">The Elite Matrix Bundle</h2>
+        <p style="color: var(--text-muted); font-size: 1.2rem; margin-top: 1rem;">Lleva las 4 arquitecturas empresariales. Código fuente completo. Inicia en 5 minutos.</p>
+        <div class="bundle-price-tag">
+          <span class="bundle-old-price">$196</span>$149
+        </div>
+        <a href="https://paypal.me/LuisMonroy76/149" class="btn-buy" style="font-size: 1.2rem; padding: 1.2rem 3rem;" target="_blank">Acquire Entire Stack</a>
+        <p style="margin-top: 2rem; font-family: var(--font-code); font-size: 0.8rem; color: #52525b; text-transform: uppercase;">
+          Envía el comprobante a alejandromonroy2020dijital@gmail.com
         </p>
       </div>
-
-      <!-- Hero Shuttle Integration (SpaceX Style Parallax) -->
-      <div class="w-full max-w-2xl absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-3/4 z-0 pointer-events-none opacity-80" id="hero-shuttle-container">
-        <img src="shuttle_real.png" alt="Shuttle Launch" id="hero-shuttle" class="w-full h-auto object-cover">
-      </div>
     </section>
 
-    <!-- The 1% Philosophy -->
-    <section class="border-t border-white/5 mt-32 relative bg-neutral-950">
-      <div class="max-w-7xl mx-auto px-6 py-32 grid md:grid-cols-2 gap-16 md:gap-8 items-center">
-        <div>
-          <h2 class="font-display text-5xl md:text-6xl mb-8">Engineering without compromise.</h2>
-          <div class="space-y-6 text-zinc-400 text-lg font-light leading-relaxed">
-            <p>El mercado está saturado de soluciones superficiales. La ingeniería élite demanda separación estricta de responsabilidades: <strong>Intelligence Core, Operaciones Deterministas y Telemetría.</strong></p>
-            <p>Nuestros sistemas se ejecutan en silencio. Convierten operaciones complejas en código riguroso que escala indefinidamente.</p>
-          </div>
-        </div>
-        <div class="glass-card rounded-3xl p-8 font-mono text-sm text-zinc-300">
-          <div class="flex gap-2 mb-6">
-            <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
-            <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-            <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
-          </div>
-          <pre class="leading-loose overflow-x-auto"><code><span class="text-zinc-500">import</span> { Engine } <span class="text-zinc-500">from</span> '@flyai/core';
-
-<span class="text-zinc-500">async function</span> deployAutonomy() {
-  <span class="text-zinc-500">const</span> swarm = <span class="text-zinc-500">new</span> Engine.Swarm();
-  
-  <span class="text-zinc-500">await</span> swarm.enforceStrictProtocols({
-    memory: <span class="text-green-400">'VectorDB'</span>,
-    persistence: <span class="text-green-400">'PostgreSQL'</span>,
-    logic: <span class="text-green-400">'Deterministic_FSM'</span>
-  });
-
-  <span class="text-zinc-500">return</span> swarm.execute();
-}</code></pre>
-        </div>
-      </div>
-    </section>
-
-    <!-- Premium Product Showcase -->
-    <section class="max-w-7xl mx-auto px-6 py-32">
-      <h2 class="font-display text-5xl text-center mb-24">Production Source Architectures</h2>
-      
-      <div class="grid md:grid-cols-2 gap-8">
+    <!-- CUSTOM DEV REQUEST FORM -->
+    <section id="custom-ai" class="container gs-reveal" style="padding: 15vh 0; margin-top: 5vh;">
+      <div class="glass-panel" style="padding: 5rem 3rem; max-width: 800px; margin: 0 auto; text-align: center; border-color: rgba(139, 92, 246, 0.3); box-shadow: 0 0 40px rgba(139, 92, 246, 0.05);">
+        <h2 style="font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 1rem; color: #fff;">Architect Your V2.0 Engine</h2>
+        <p style="color: var(--text-muted); margin-bottom: 3rem; font-size: 1.1rem; line-height: 1.6;">
+          ¿Tienes una visión que el código genérico no puede alcanzar? Comparte tu visión de backend o infraestructura de IA. Nuestro equipo de desarrollo de élite lo construirá desde cero a la perfección.
+        </p>
         
-        <!-- P1 -->
-        <div class="glass-card p-10 rounded-3xl group cursor-pointer flex flex-col justify-between min-h-[400px]">
-          <div>
-            <div class="auth-badge text-xs font-mono uppercase tracking-widest text-zinc-500 mb-6">Sector: FinTech Security</div>
-            <h3 class="font-display text-4xl mb-4 text-white group-hover:text-zinc-300 transition-colors">Neural Vault</h3>
-            <p class="text-zinc-400 text-lg font-light leading-relaxed">Infraestructura de biometría grado bancario y detección de fraude en tiempo real.</p>
+        <div id="request-form">
+          <input type="text" id="req-name" placeholder="Tu Nombre / Entidad" style="width: 100%; padding: 1.2rem; margin-bottom: 1rem; background: rgba(0,0,0,0.5); border: 1px solid #27272a; color: white; border-radius: 12px; font-family: var(--font-body); font-size: 1rem; outline: none;">
+          <textarea id="req-desc" rows="5" placeholder="¿Qué necesitas que diseñemos y programemos para tu empresa?..." style="width: 100%; padding: 1.2rem; margin-bottom: 2rem; background: rgba(0,0,0,0.5); border: 1px solid #27272a; color: white; border-radius: 12px; font-family: var(--font-body); resize: vertical; font-size: 1rem; outline: none;"></textarea>
+          <button onclick="submitRequest()" class="btn-buy" style="width: 100%; margin-top: 0; background: linear-gradient(90deg, var(--accent-neon), var(--accent-purple)); color: #fff; font-size: 1.1rem; padding: 1.2rem; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;">Deploy Custom Request</button>
+        </div>
+
+        <div id="request-success" style="display: none; text-align: center;">
+          <div style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.5rem;">✅</div>
+          <h3 style="color: #10b981; font-family: var(--font-display); font-size: 1.8rem; margin-bottom: 1rem;">Transmission Secured</h3>
+          <p style="color: var(--text-main); margin-bottom: 2rem; font-size: 1.1rem;">Tu visión está en camino a nuestros servidores. Conéctate con nosotros inmediatamente vía chat para revisar la arquitectura y acelerar el desarrollo:</p>
+          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="https://wa.me/573214366769" target="_blank" class="btn-buy" style="margin-top:0; background: #25D366; color: white; border-radius: 100px; padding: 0.8rem 1.5rem; display: flex; gap: 8px; align-items: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+              Chat WhatsApp
+            </a>
+            <a href="https://t.me/miBisnessFly_bot" target="_blank" class="btn-buy" style="margin-top:0; background: #0088cc; color: white; border-radius: 100px; padding: 0.8rem 1.5rem; display: flex; gap: 8px; align-items: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 24c6.627 0 12-5.373 12-12S18.627 0 12 0 0 5.373 0 12s5.373 12 12 12Z" fill="#0088cc"/><path d="m5.445 11.838 12.182-4.704c.565-.205 1.05.137.863 1.01l-2.073 9.771c-.173.784-.644.981-1.306.608l-3.608-2.659-1.741 1.677c-.193.193-.355.355-.73.355l.261-3.682 6.702-6.046c.29-.26-.062-.405-.448-.146L7.26 13.256l-3.57-1.12c-.776-.244-.792-.776.155-1.147Z" fill="#fff"/></svg>
+              Connect Telegram ID
+            </a>
           </div>
-          <a href="https://paypal.me/LuisMonroy76/49" target="_blank" class="block w-fit mt-8 border border-white/20 text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors">Acquire $49</a>
         </div>
-
-        <!-- P2 -->
-        <div class="glass-card p-10 rounded-3xl group cursor-pointer flex flex-col justify-between min-h-[400px]">
-          <div>
-            <div class="auth-badge text-xs font-mono uppercase tracking-widest text-zinc-500 mb-6">Sector: Corporate Law</div>
-            <h3 class="font-display text-4xl mb-4 text-white group-hover:text-zinc-300 transition-colors">Legal AI Scanner</h3>
-            <p class="text-zinc-400 text-lg font-light leading-relaxed">Auditoría semántica de contratos de alto riesgo y parsing automático LLM.</p>
-          </div>
-          <a href="https://paypal.me/LuisMonroy76/49" target="_blank" class="block w-fit mt-8 border border-white/20 text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors">Acquire $49</a>
-        </div>
-
-        <!-- P3 -->
-        <div class="glass-card p-10 rounded-3xl group cursor-pointer flex flex-col justify-between min-h-[400px]">
-          <div>
-            <div class="auth-badge text-xs font-mono uppercase tracking-widest text-zinc-500 mb-6">Sector: Real Estate</div>
-            <h3 class="font-display text-4xl mb-4 text-white group-hover:text-zinc-300 transition-colors">Wealth Matrix</h3>
-            <p class="text-zinc-400 text-lg font-light leading-relaxed">Gestión predictiva de propiedades UHNW y análisis de plusvalía neural.</p>
-          </div>
-          <a href="https://paypal.me/LuisMonroy76/49" target="_blank" class="block w-fit mt-8 border border-white/20 text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors">Acquire $49</a>
-        </div>
-
-        <!-- P4 -->
-        <div class="glass-card p-10 rounded-3xl group cursor-pointer flex flex-col justify-between min-h-[400px]">
-          <div>
-            <div class="auth-badge text-xs font-mono uppercase tracking-widest text-zinc-500 mb-6">Sector: B2B Enterprise</div>
-            <h3 class="font-display text-4xl mb-4 text-white group-hover:text-zinc-300 transition-colors">Nexus CRM</h3>
-            <p class="text-zinc-400 text-lg font-light leading-relaxed">Orquestación de pipelines autónomos, score de leads B2B y automatización de outreach.</p>
-          </div>
-          <a href="https://paypal.me/LuisMonroy76/49" target="_blank" class="block w-fit mt-8 border border-white/20 text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors">Acquire $49</a>
-        </div>
-
-      </div>
-
-      <!-- Elite Bundle -->
-      <div class="mt-20 glass-card rounded-[3rem] p-12 text-center border-white/10 relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
-        <h2 class="font-display text-5xl md:text-6xl mb-6 relative z-10">The Matrix Ecosystem</h2>
-        <p class="text-zinc-400 text-xl font-light mb-12 relative z-10">Las 4 arquitecturas empresariales unificadas. Listo para compilar.</p>
-        <div class="flex items-center justify-center gap-6 mb-12 relative z-10">
-          <span class="text-3xl text-zinc-600 line-through font-light">$196</span>
-          <span class="font-display text-7xl">$149</span>
-        </div>
-        <a href="https://paypal.me/LuisMonroy76/149" target="_blank" class="btn-premium px-12 py-5 rounded-full font-medium text-lg inline-block relative z-10">Download Complete Stack</a>
       </div>
     </section>
 
-    <!-- Custom Architecture Form -->
-    <section class="max-w-4xl mx-auto px-6 py-32">
-      <div class="text-center mb-16">
-        <h2 class="font-display text-5xl mb-6">Request V2.0 Architecture</h2>
-        <p class="text-zinc-400 text-lg font-light">Diseñamos soluciones IA a la medida con estándares de Fortune 500.</p>
-      </div>
-
-      <div id="request-form" class="glass-card rounded-3xl p-8 md:p-12">
-        <input type="text" id="req-name" placeholder="Entity / Identity" class="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-6 py-4 mb-6 text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/30 transition-colors font-sans">
-        <textarea id="req-desc" rows="4" placeholder="Specify your infrastructure requirements..." class="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-6 py-4 mb-8 text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/30 transition-colors font-sans resize-y"></textarea>
-        <button onclick="submitRequest()" class="w-full btn-premium py-4 rounded-xl font-medium">Initiate Deployment Protocol</button>
-      </div>
-
-      <div id="request-success" class="hidden glass-card rounded-3xl p-12 text-center">
-        <div class="w-16 h-16 rounded-full border border-zinc-700 flex items-center justify-center mx-auto mb-6">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-        </div>
-        <h3 class="font-display text-4xl mb-4">Transmission Secured</h3>
-        <p class="text-zinc-400 mb-10">Protocolo iniciado. Establezca conexión segura inmediata con el Arquitecto Principal:</p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="https://wa.me/573214366769" target="_blank" class="px-8 py-3 rounded-full border border-white/20 hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-3">
-            WhatsApp
-          </a>
-          <a href="https://t.me/miBisnessFly_bot" target="_blank" class="px-8 py-3 rounded-full border border-white/20 hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-3">
-            Telegram
-          </a>
-        </div>
-      </div>
-    </section>
   </main>
 
-  <footer class="border-t border-white/5 mt-20">
-    <div class="max-w-7xl mx-auto px-6 py-12 text-center font-mono text-xs text-zinc-600 uppercase tracking-widest">
-      &copy; 2026 FLY.AI Studio. Zero Simulations.
+  <footer class="footer">
+    <div class="container">
+      &copy; 2026 FLY.AI STUDIO · ELITE ENGINEERING & ARCHITECTURE · ZERO SIMULATIONS
     </div>
   </footer>
 
   <script>
+    // Reveal form logic
     function submitRequest() {
-      const n = document.getElementById('req-name').value;
-      const d = document.getElementById('req-desc').value;
-      if(n && d) {
+      const name = document.getElementById('req-name').value;
+      const desc = document.getElementById('req-desc').value;
+      if (name && desc) {
+        // Here you could add an actual fetch() request to your backend to save it in SQL.
         document.getElementById('request-form').style.display = 'none';
         document.getElementById('request-success').style.display = 'block';
+      } else {
+        alert("ENGINEERING SECURE PROTOCOL: Por favor completa los campos.");
       }
     }
 
-    gsap.registerPlugin(ScrollTrigger);
+    // Initialize Lenis Smooth Scroll
+    const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
 
-    // Elegant Majestic Shuttle Ascent
-    gsap.to("#hero-shuttle", {
-      y: -800, // Gradual upward parallax
-      scale: 0.9,
-      ease: "power1.out",
+    // Spaceship / Transbordador Cinematic Parallax
+    gsap.to("#shuttle", {
+      y: - (document.documentElement.scrollHeight + 1500), // Massive upward trajectory
+      x: - (window.innerWidth * 0.35), // Drifts smoothly to the left
+      rotation: -12, // Slight tilt corresponding to the arc
+      scale: 0.65, // Recedes into deep space
+      ease: "power2.inOut",
       scrollTrigger: {
         trigger: "body",
         start: "top top",
-        end: "200% bottom",
-        scrub: 1.5 // Buttery smooth lag
+        end: "bottom bottom",
+        scrub: 0.8 // Smoother scrubbing friction
       }
     });
 
+    // Fade up animations
+    const revealElements = document.querySelectorAll('.gs-reveal');
+    revealElements.forEach((el) => {
+      gsap.fromTo(el, 
+        { autoAlpha: 0, y: 50 }, 
+        { 
+          duration: 1, 
+          autoAlpha: 1, 
+          y: 0, 
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 85%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    });
+
+    // Custom Canvas Ambient Particle System (WebGL-like feel)
+    const canvas = document.getElementById('ambient-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let particles = [];
+    
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 2;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.speedY = Math.random() * 1 - 0.5;
+        this.opacity = Math.random() * 0.5 + 0.1;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > width) this.speedX *= -1;
+        if (this.y < 0 || this.y > height) this.speedY *= -1;
+      }
+      draw() {
+        ctx.fillStyle = `rgba(6, 182, 212, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    function initParticles() {
+      particles = [];
+      const particleCount = Math.floor((width * height) / 15000);
+      for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+    }
+    initParticles();
+    
+    function drawLines() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 120) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(139, 92, 246, ${0.1 - distance/1200})`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+    
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      drawLines();
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // -- SHUTTLE SMOKE VOLUMETRIC PARTICLE SYSTEM --
+    const smokeCanvas = document.getElementById('smoke-canvas');
+    const sCtx = smokeCanvas.getContext('2d');
+    let smokeParticles = [];
+
+    class SmokeParticle {
+      constructor() {
+        // Thrust originates from the absolute center of the 300px canvas (x=150)
+        this.x = 150 + (Math.random() * 20 - 10); 
+        this.y = 10; // Immediately abutting the engines
+        
+        // Massive volumetric base size
+        this.size = Math.random() * 25 + 10;
+        
+        // Plume spreads outwards dynamically
+        this.speedX = (Math.random() - 0.5) * 6; 
+        this.speedY = Math.random() * 10 + 6; // Heavy downwards thrust
+        this.life = 1.0;
+        
+        // Gradient of Plasma to Smoke
+        const rand = Math.random();
+        if (rand > 0.90) {
+          this.color = `rgba(255, 255, 255, `; // Core Plasma
+        } else if (rand > 0.75) {
+          this.color = `rgba(14, 215, 240, `;  // Neon Cyan Afterburner
+        } else if (rand > 0.55) {
+          this.color = `rgba(180, 50, 240, `;   // Purple Ignition
+        } else {
+          this.color = `rgba(100, 100, 105, `; // Deep Volumetric Smoke
+        }
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.size += 1.8; // Expand heavily to create billows
+        this.life -= 0.02; // Slower evaporation for a longer trail
+      }
+      draw() {
+        sCtx.fillStyle = this.color + Math.max(this.life, 0) + ')';
+        sCtx.beginPath();
+        sCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        sCtx.fill();
+        
+        // Add core glow for plasma particles
+        if (this.color.includes('255, 255, 255') || this.color.includes('14, 215, 240')) {
+          sCtx.fillStyle = `rgba(255,255,255,${this.life * 0.5})`;
+          sCtx.beginPath();
+          sCtx.arc(this.x, this.y, this.size * 0.4, 0, Math.PI * 2);
+          sCtx.fill();
+        }
+      }
+    }
+
+    function animateSmoke() {
+      // Clear with slight trailing opacity for motion blur effect
+      sCtx.globalCompositeOperation = 'destination-out';
+      sCtx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      sCtx.fillRect(0, 0, smokeCanvas.width, smokeCanvas.height);
+      sCtx.globalCompositeOperation = 'lighter'; // Additive blending for pure fire
+      
+      // Inject thick volumetric particles continuously
+      for(let i=0; i<8; i++) {
+        smokeParticles.push(new SmokeParticle());
+      }
+      
+      for (let i = smokeParticles.length - 1; i >= 0; i--) {
+        let p = smokeParticles[i];
+        p.update();
+        p.draw();
+        if(p.life <= 0) {
+          smokeParticles.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(animateSmoke);
+    }
+    animateSmoke();
   </script>
 </body>
 </html>
