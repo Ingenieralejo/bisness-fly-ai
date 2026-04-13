@@ -546,18 +546,18 @@ async function AutonomousEngine() {
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
 
-    // Initialize GSAP ScrollTrigger
-    gsap.registerPlugin(ScrollTrigger);
-
-    // Spaceship / Transbordador Animation (Ascending)
+    // Spaceship / Transbordador Cinematic Parallax
     gsap.to("#shuttle", {
-      y: - (document.documentElement.scrollHeight + 800), // Move the spaceship UP the entire scroll height
-      ease: "none",
+      y: - (document.documentElement.scrollHeight + 1500), // Massive upward trajectory
+      x: - (window.innerWidth * 0.35), // Drifts smoothly to the left
+      rotation: -12, // Slight tilt corresponding to the arc
+      scale: 0.65, // Recedes into deep space
+      ease: "power2.inOut",
       scrollTrigger: {
         trigger: "body",
         start: "top top",
         end: "bottom bottom",
-        scrub: 0.5 // It moves tied to the scroll perfectly
+        scrub: 0.8 // Smoother scrubbing friction
       }
     });
 
@@ -651,52 +651,68 @@ async function AutonomousEngine() {
     }
     animate();
 
-    // -- SHUTTLE SMOKE PARTICLE SYSTEM --
+    // -- SHUTTLE SMOKE VOLUMETRIC PARTICLE SYSTEM --
     const smokeCanvas = document.getElementById('smoke-canvas');
     const sCtx = smokeCanvas.getContext('2d');
     let smokeParticles = [];
 
     class SmokeParticle {
       constructor() {
-        this.x = 150 + (Math.random() * 30 - 15); // Centered at 150x
-        this.y = 20; // Starts right under the engines
-        this.size = Math.random() * 15 + 5;
-        this.speedX = Math.random() * 4 - 2; // Spread outwards
-        this.speedY = Math.random() * 8 + 5; // Fast downward thrust
+        // Thrust originates from the absolute center of the 300px canvas (x=150)
+        this.x = 150 + (Math.random() * 20 - 10); 
+        this.y = 10; // Immediately abutting the engines
+        
+        // Massive volumetric base size
+        this.size = Math.random() * 25 + 10;
+        
+        // Plume spreads outwards dynamically
+        this.speedX = (Math.random() - 0.5) * 6; 
+        this.speedY = Math.random() * 10 + 6; // Heavy downwards thrust
         this.life = 1.0;
         
-        // Dynamic realistic fire/smoke colors
+        // Gradient of Plasma to Smoke
         const rand = Math.random();
-        if (rand > 0.85) {
-          this.color = `rgba(255, 255, 255, `; // White hot core
-        } else if (rand > 0.6) {
-          this.color = `rgba(255, 140, 0, `;  // Orange fire
-        } else if (rand > 0.4) {
-          this.color = `rgba(220, 38, 38, `;   // Red fire edge
+        if (rand > 0.90) {
+          this.color = `rgba(255, 255, 255, `; // Core Plasma
+        } else if (rand > 0.75) {
+          this.color = `rgba(14, 215, 240, `;  // Neon Cyan Afterburner
+        } else if (rand > 0.55) {
+          this.color = `rgba(180, 50, 240, `;   // Purple Ignition
         } else {
-          this.color = `rgba(150, 150, 150, `; // Billowing grey smoke
+          this.color = `rgba(100, 100, 105, `; // Deep Volumetric Smoke
         }
       }
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
-        this.size += 1.2; // Smoke expands rapidly
-        this.life -= 0.025; // Fades out to 0
+        this.size += 1.8; // Expand heavily to create billows
+        this.life -= 0.02; // Slower evaporation for a longer trail
       }
       draw() {
         sCtx.fillStyle = this.color + Math.max(this.life, 0) + ')';
         sCtx.beginPath();
         sCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         sCtx.fill();
+        
+        // Add core glow for plasma particles
+        if (this.color.includes('255, 255, 255') || this.color.includes('14, 215, 240')) {
+          sCtx.fillStyle = `rgba(255,255,255,${this.life * 0.5})`;
+          sCtx.beginPath();
+          sCtx.arc(this.x, this.y, this.size * 0.4, 0, Math.PI * 2);
+          sCtx.fill();
+        }
       }
     }
 
     function animateSmoke() {
-      // Create trailing effect for smoke
-      sCtx.clearRect(0, 0, smokeCanvas.width, smokeCanvas.height);
+      // Clear with slight trailing opacity for motion blur effect
+      sCtx.globalCompositeOperation = 'destination-out';
+      sCtx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      sCtx.fillRect(0, 0, smokeCanvas.width, smokeCanvas.height);
+      sCtx.globalCompositeOperation = 'lighter'; // Additive blending for pure fire
       
-      // Inject thrust particles continuously
-      for(let i=0; i<6; i++) {
+      // Inject thick volumetric particles continuously
+      for(let i=0; i<8; i++) {
         smokeParticles.push(new SmokeParticle());
       }
       
