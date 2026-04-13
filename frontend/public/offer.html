@@ -344,9 +344,10 @@
 </head>
 <body>
   
-  <!-- The Photorealistic NASA Shuttle -->
-  <div id="shuttle" style="position: fixed; z-index: 50; bottom: -500px; right: 5vw; width: 300px; pointer-events: none; mix-blend-mode: screen;">
-    <img src="shuttle_real.png" alt="Space Shuttle" style="width: 100%; object-fit: contain;">
+  <!-- The Photorealistic NASA Shuttle with Dynamic Engine -->
+  <div id="shuttle" style="position: fixed; z-index: 50; bottom: -500px; right: 5vw; width: 140px; pointer-events: none; mix-blend-mode: screen; display: flex; flex-direction: column; align-items: center;">
+    <img src="clean_shuttle.png" alt="Space Shuttle" style="width: 100%; object-fit: contain; z-index: 2;">
+    <canvas id="smoke-canvas" width="300" height="500" style="position: absolute; top: 75%; z-index: 1; pointer-events: none; filter: blur(5px);"></canvas>
   </div>
 
   <!-- Canvas for Ambient WebGL effect (simulated with HTML5 Canvas API) -->
@@ -649,6 +650,67 @@ async function AutonomousEngine() {
       requestAnimationFrame(animate);
     }
     animate();
+
+    // -- SHUTTLE SMOKE PARTICLE SYSTEM --
+    const smokeCanvas = document.getElementById('smoke-canvas');
+    const sCtx = smokeCanvas.getContext('2d');
+    let smokeParticles = [];
+
+    class SmokeParticle {
+      constructor() {
+        this.x = 150 + (Math.random() * 30 - 15); // Centered at 150x
+        this.y = 20; // Starts right under the engines
+        this.size = Math.random() * 15 + 5;
+        this.speedX = Math.random() * 4 - 2; // Spread outwards
+        this.speedY = Math.random() * 8 + 5; // Fast downward thrust
+        this.life = 1.0;
+        
+        // Dynamic realistic fire/smoke colors
+        const rand = Math.random();
+        if (rand > 0.85) {
+          this.color = `rgba(255, 255, 255, `; // White hot core
+        } else if (rand > 0.6) {
+          this.color = `rgba(255, 140, 0, `;  // Orange fire
+        } else if (rand > 0.4) {
+          this.color = `rgba(220, 38, 38, `;   // Red fire edge
+        } else {
+          this.color = `rgba(150, 150, 150, `; // Billowing grey smoke
+        }
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.size += 1.2; // Smoke expands rapidly
+        this.life -= 0.025; // Fades out to 0
+      }
+      draw() {
+        sCtx.fillStyle = this.color + Math.max(this.life, 0) + ')';
+        sCtx.beginPath();
+        sCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        sCtx.fill();
+      }
+    }
+
+    function animateSmoke() {
+      // Create trailing effect for smoke
+      sCtx.clearRect(0, 0, smokeCanvas.width, smokeCanvas.height);
+      
+      // Inject thrust particles continuously
+      for(let i=0; i<6; i++) {
+        smokeParticles.push(new SmokeParticle());
+      }
+      
+      for (let i = smokeParticles.length - 1; i >= 0; i--) {
+        let p = smokeParticles[i];
+        p.update();
+        p.draw();
+        if(p.life <= 0) {
+          smokeParticles.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(animateSmoke);
+    }
+    animateSmoke();
   </script>
 </body>
 </html>
