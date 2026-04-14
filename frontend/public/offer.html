@@ -605,8 +605,8 @@ async function AutonomousEngine() {
     </div>
   </footer>
 
-  <!-- FULL PROJECTS VAULT MODAL -->
-  <div id="vault-modal" class="vault-modal">
+  <!-- FULL PROJECTS VAULT MODAL (Includes data-lenis-prevent to allow scrolling inside over Lenis) -->
+  <div id="vault-modal" class="vault-modal" data-lenis-prevent="true">
     <div class="vault-close" onclick="toggleVault()">×</div>
     <div class="vault-header">
       <h2>Architecture Vault</h2>
@@ -658,7 +658,12 @@ async function AutonomousEngine() {
     function toggleVault() {
       const v = document.getElementById('vault-modal');
       v.classList.toggle('open');
-      if(v.classList.contains('open')) filterVault('all');
+      if(v.classList.contains('open')) {
+        filterVault('all');
+        if(typeof lenis !== 'undefined') lenis.stop(); // Pause body parallax
+      } else {
+        if(typeof lenis !== 'undefined') lenis.start(); // Resume original scrolling
+      }
     }
 
     function filterVault(category) {
