@@ -629,15 +629,45 @@ async function AutonomousEngine() {
 
   <script>
     // Reveal form logic
-    function submitRequest() {
+    async function submitRequest() {
       const name = document.getElementById('req-name').value;
       const desc = document.getElementById('req-desc').value;
+      const btn = event.target;
+      
       if (name && desc) {
-        // Here you could add an actual fetch() request to your backend to save it in SQL.
-        document.getElementById('request-form').style.display = 'none';
-        document.getElementById('request-success').style.display = 'block';
+        btn.disabled = true;
+        btn.innerText = "TRANSMITTING DATA...";
+        
+        try {
+          const response = await fetch('http://localhost:4000/api/production/projects', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: `Custom Architecture: ${name}`,
+              description: desc,
+              clientName: name,
+              priority: 'HIGH',
+              metadata: { source: 'landing_page_offer' }
+            })
+          });
+
+          if (response.ok) {
+            document.getElementById('request-form').style.display = 'none';
+            document.getElementById('request-success').style.display = 'block';
+            
+            // Interaction feedback
+            gsap.from("#request-success", { duration: 1, y: 30, opacity: 0, ease: "power3.out" });
+          } else {
+            throw new Error('Neural transmission failed');
+          }
+        } catch (error) {
+          console.error(error);
+          alert("ENGINEERING ALERT: Error en la transmisión neural. Verifica la conexión con el servidor.");
+          btn.disabled = false;
+          btn.innerText = "Deploy Custom Request";
+        }
       } else {
-        alert("ENGINEERING SECURE PROTOCOL: Por favor completa los campos.");
+        alert("ENGINEERING SECURE PROTOCOL: Por favor completa todos los campos para el despliegue.");
       }
     }
 
