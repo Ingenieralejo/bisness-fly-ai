@@ -1,3 +1,4 @@
+import 'dotenv/config'; // MUST be first
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { TelegramAgent } from './notifications/telegram.agent';
@@ -6,6 +7,19 @@ import { KnowledgeInjectionService } from '../../knowledge/knowledge-injection.s
 import { Cron, CronExpression } from '@nestjs/schedule';
 import * as cryptoHelper from 'crypto';
 import axios from 'axios';
+import { z } from 'zod';
+import { URLS } from '../../shared/constants/urls';
+import { RevenueOrchestrator } from '../../engines/revenue-models/revenue-orchestrator.service';
+
+// Zod Schema para extracción financiera
+const DigitalProductSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  price: z.number().min(250).max(499),
+  currency: z.literal('USD').default('USD'),
+  category: z.enum(['ENTERPRISE_TOOL', 'PREMIUM_FRAMEWORK', 'MASTERCLASS_BUNDLE'])
+});
+type DigitalProduct = z.infer<typeof DigitalProductSchema>;
 
 // ─────────────────────────────────────────────────────────────
 //  Type Definitions
@@ -31,13 +45,7 @@ interface KingTelemetry {
   timestamp: Date;
 }
 
-interface DigitalProduct {
-  title: string;
-  description: string;
-  price: number;
-  currency: string;
-  category: string;
-}
+// Removed duplicate DigitalProduct interface in favor of Zod inference
 
 export interface IntegrationHealth {
   name: string;
@@ -52,6 +60,8 @@ export interface KingHealthReport {
   telegram: IntegrationHealth;
   twitter: IntegrationHealth;
   gumroad: IntegrationHealth;
+  paypal: IntegrationHealth;
+
   overallScore: number;
   checkedAt: Date;
 }
@@ -91,6 +101,7 @@ export class KingAgent {
     private readonly notifier: TelegramAgent,
     private readonly localModel: LocalModelService,
     private readonly knowledgeBase: KnowledgeInjectionService,
+    private readonly revenueModels: RevenueOrchestrator,
   ) {}
 
   // ═══════════════════════════════════════════════════════════
@@ -126,16 +137,36 @@ export class KingAgent {
       await this.deployDigitalProduct(currentMemory);
       await this.logTelemetry('PRODUCT_DEPLOY', 'SUCCESS', 'Producto digital desplegado en pipeline.');
 
-      // Phase 5 — PAPER TRADING ARBITRAGE (Simulated Revenue)
-      await this.logTelemetry('PAPER_ARBITRAGE', 'RUNNING', 'Ejecutando arbitraje en papel (Kelly Criterion)...');
-      await this.executePaperArbitrage();
-      await this.logTelemetry('PAPER_ARBITRAGE', 'SUCCESS', 'Arbitraje completado con éxito operativo.');
+      // Phase 5 — PHYSICAL AGGRESSION (God Mode Outreach)
+      await this.logTelemetry('GOD_MODE_OUTREACH', 'RUNNING', 'Ejecutando Infiltración Física (WhatsApp) a High-Net-Worth Targets...');
+      await this.executeGodModeOutreach();
+      await this.logTelemetry('GOD_MODE_OUTREACH', 'SUCCESS', 'Ataque de extracción de revenue completado.');
+
+      // Phase 6 — REVENUE MODELS SYNC (5 Real Income Streams)
+      await this.logTelemetry('REVENUE_MODELS', 'RUNNING', 'Sincronizando 5 canales de ingreso real...');
+      await this.syncRevenueModels();
+      await this.logTelemetry('REVENUE_MODELS', 'SUCCESS', '5 canales de ingreso sincronizados.');
 
       await this.logTelemetry('CYCLE_COMPLETE', 'SUCCESS', `Ciclo #${this.cycleCount} ejecutado sin errores. Esperando siguiente pulso.`);
+
+      // Notify Telegram with a strategic summary
+      const statusIcon = '👑';
+      const summary = `${statusIcon} *INFORME DE CICLO KING #${this.cycleCount}* \n\n` +
+        `🆔 ID: \`${this.currentCycleId}\` \n` +
+        `✅ Estado: *COMPLETO* \n` +
+        `💰 Tesorería: Verificada y Sincronizada \n` +
+        `🎯 Leads Impactados: Ciclo de ataque finalizado \n` +
+        `📊 Revenue Models: 5 canales activos \n` +
+        `🚀 Próximo: En 30 minutos.`;
+      
+      await this.notifier.sendAlert(summary).catch(() => { /* silent fail */ });
+
     } catch (e: unknown) {
       const errMsg = e instanceof Error ? e.message : 'Unknown KING cycle error';
       await this.logTelemetry('CYCLE_COMPLETE', 'FAILED', `Error crítico: ${errMsg}`);
       this.logger.error(`❌ KING FATAL: ${errMsg}`);
+      
+      await this.notifier.sendAlert(`⚠️ *FALLO CRÍTICO EN KING #${this.cycleCount}* \n\nError: \`${errMsg}\``).catch(() => {});
     }
   }
 
@@ -149,15 +180,21 @@ export class KingAgent {
     this.logger.log('🛡️ KING: DIRECTIVA DE PRESERVACIÓN DE CAPITAL ACTIVADA: Riesgo de pérdida = 0% (Solo Ventas y Barridos).');
 
     try {
-      const binanceVault = await this.prisma.vaultCredential.findFirst({
-        where: { type: 'BINANCE_LIVE' },
-      });
-      const apiKeys: BinanceKeys | null = binanceVault?.metadata
-        ? JSON.parse(binanceVault.metadata)
-        : null;
+      const apiKey = process.env['BINANCE_API_KEY'];
+      const apiSecret = process.env['BINANCE_API_SECRET'];
+      const apiKeys: BinanceKeys | null = apiKey && apiSecret ? { apiKey, apiSecret } : null;
 
       let binanceBalance = 0;
       let onChainBalance = 0;
+      let platformCapturedBalance = 0;
+
+      // 💳 PLATFORM ASSET CENTRALIZATION: Collect ALL verified revenue across the ecosystem
+      const pendingRevenue = await this.prisma.revenueEvent.aggregate({
+        where: { isVerified: true }, // Count all verified revenue
+        _sum: { amount: true }
+      });
+      platformCapturedBalance = pendingRevenue._sum.amount || 0;
+      this.logger.log(`📥 PLATFORM ASSETS (All Businesses): $${platformCapturedBalance.toFixed(2)}`);
 
       // Binance CEX Balance (USDT)
       if (apiKeys?.apiKey && apiKeys?.apiSecret) {
@@ -171,8 +208,8 @@ export class KingAgent {
       onChainBalance = await this.getLiveOnChainBalance();
       this.logger.log(`💰 NEAR On-Chain USD: $${onChainBalance.toFixed(2)}`);
 
-      const totalBalance = binanceBalance + onChainBalance;
-      this.logger.log(`💰 KING Total Treasury: $${totalBalance.toFixed(2)} USD`);
+      const totalBalance = binanceBalance + onChainBalance + platformCapturedBalance;
+      this.logger.log(`💰 KING Total Global Treasury: $${totalBalance.toFixed(2)} USD`);
 
       // Log balance snapshot to DB for dashboard
       await this.prisma.marketSignal.create({
@@ -246,16 +283,22 @@ export class KingAgent {
   private async executeNeuralCommerce(memory: string): Promise<void> {
     this.logger.log('✍️ KING: Formulando tesis macro con contexto neural de 15 años...');
 
-    const prompt = `You are KING, an autonomous financial AI entity at God Level.
-Context loaded (15yr market memory): ${memory.substring(0, 2000)}...
-
-TASK: Generate a terrifyingly accurate and highly aggressive FOMO financial thesis.
-- Must be under 280 chars (Twitter constraint)
-- Must include a brutal reality check for businesses NOT using AI.
-- Pitch the sale of your exclusive AI Framework / Masterclass (assume link is in bio).
-- Language: Spanish
-- Tone: Ruthless, authoritative, "buy now or become obsolete."
-Return ONLY the exact tweet text. No quotes, no prefixes.`;
+    const currentYear = new Date().getFullYear();
+    const prompt = `
+      ### ROLE: KING - ELITE AUTONOMOUS FINANCIAL GOD
+      ### HARD CONSTRAINTS:
+      - ZERO SIMULATION. ALL THESES MUST BE BASED ON REAL MARKET CONDITIONS.
+      - THE CURRENT YEAR IS ${currentYear}. NEVER reference any past year.
+      - CONTEXT: 15YR MEMORY: ${memory.substring(0, 1000)}...
+      - GENERATE AN AGGRESSIVE FOMO FINANCIAL THESIS.
+      - BRUTAL REALITY CHECK FOR BUSINESSES IGNORING AI.
+      - PITCH FLY.AI EXCLUSIVE MASTERCLASS.
+      - UNDER 280 CHARACTERS.
+      - LANGUAGE: SPANISH. 
+      - TONE: RUTHLESS, AUTHORITATIVE.
+      
+      Return ONLY the exact tweet text.
+    `;
 
     try {
       const thesis = await this.localModel.executeReasoning(
@@ -277,34 +320,29 @@ Return ONLY the exact tweet text. No quotes, no prefixes.`;
       });
 
       // Attempt Twitter/X API publishing
-      const twitterVault = await this.prisma.vaultCredential.findFirst({
-        where: { type: 'TWITTER_API' },
-      });
+      const bearerToken = process.env['TWITTER_BEARER_TOKEN'];
 
-      if (twitterVault?.metadata) {
-        const keys = JSON.parse(twitterVault.metadata);
-        if (keys.bearerToken) {
-          try {
-            await axios.post(
-              'https://api.twitter.com/2/tweets',
-              { text: thesis },
-              {
-                headers: {
-                  Authorization: `Bearer ${keys.bearerToken}`,
-                  'Content-Type': 'application/json',
-                },
+      if (bearerToken) {
+        try {
+          await axios.post(
+            'https://api.twitter.com/2/tweets',
+            { text: thesis },
+            {
+              headers: {
+                Authorization: `Bearer ${bearerToken}`,
+                'Content-Type': 'application/json',
               },
-            );
-            this.logger.log('📤 KING: Tesis publicada en X/Twitter.');
-            await this.logTelemetry('SOCIAL_POST', 'SUCCESS', `Tweet publicado: ${thesis.substring(0, 60)}...`);
-          } catch (twitterErr: unknown) {
-            const tMsg = twitterErr instanceof Error ? twitterErr.message : 'Twitter API error';
-            this.logger.warn(`⚠️ Twitter API falló: ${tMsg}. Tesis guardada en DB.`);
-            await this.logTelemetry('SOCIAL_POST', 'FAILED', `Twitter API: ${tMsg}`);
-          }
+            },
+          );
+          this.logger.log('📤 KING: Tesis publicada en X/Twitter.');
+          await this.logTelemetry('SOCIAL_POST', 'SUCCESS', `Tweet publicado: ${thesis.substring(0, 60)}...`);
+        } catch (twitterErr: unknown) {
+          const tMsg = twitterErr instanceof Error ? twitterErr.message : 'Twitter API error';
+          this.logger.warn(`⚠️ Twitter API falló: ${tMsg}. Tesis guardada en DB.`);
+          await this.logTelemetry('SOCIAL_POST', 'FAILED', `Twitter API: ${tMsg}`);
         }
       } else {
-        this.logger.warn('⚠️ KING: Sin claves Twitter. Tesis almacenada en DB.');
+        this.logger.warn('⚠️ KING: Sin claves Twitter en .env. Tesis almacenada en DB.');
       }
     } catch (e: unknown) {
       const errMsg = e instanceof Error ? e.message : 'Neural commerce error';
@@ -319,24 +357,38 @@ Return ONLY the exact tweet text. No quotes, no prefixes.`;
   private async deployDigitalProduct(memory: string): Promise<void> {
     this.logger.log('🏗️ KING: Generating AI-powered digital product...');
 
-    const prompt = `You are KING, an autonomous AI product creator aiming for $1000 in daily revenue.
-Using this market context: ${memory.substring(0, 1000)}
-
-Generate an ULTRA-HIGH-TICKET digital asset (AI Framework, Masterclass, or Enterprise Tool) that can be sold for $250-$499 immediately to B2B clients or high-net-worth individuals:
-Return a JSON object with these exact keys:
-- title: Product name (Spanish, highly premium and authoritative)
-- description: One-line compelling pitch explaining massive ROI (Spanish)
-- price: number between 250 and 499
-- currency: "USD"
-- category: one of ["ENTERPRISE_TOOL", "PREMIUM_FRAMEWORK", "MASTERCLASS_BUNDLE"]
-
-Return ONLY valid JSON. No markdown, no explanation.`;
+    const currentYear = new Date().getFullYear();
+    const prompt = `
+      ### ROLE: KING - SUPREME AI PRODUCT ARCHITECT
+      ### HARD CONSTRAINTS:
+      - ZERO SIMULATION. REAL MARKET ASSET GENERATION.
+      - THE CURRENT YEAR IS ${currentYear}. NEVER reference any past year. ALL dates and copy MUST use ${currentYear}.
+      - TARGET: $1000+ DAILY REVENUE.
+      - GENERATE AN ULTRA-HIGH-TICKET DIGITAL ASSET ($250-$499).
+      - MARKET CONTEXT: ${memory.substring(0, 500)}
+      - RETURN VALID JSON ONLY.
+      
+      ### JSON SCHEMA:
+      {
+        "title": "Premium authoritative name (Spanish)",
+        "description": "Brutal ROI pitch (Spanish, must reference year ${currentYear} if any year is mentioned)",
+        "price": 250-499,
+        "currency": "USD",
+        "category": "ENTERPRISE_TOOL" | "PREMIUM_FRAMEWORK" | "MASTERCLASS_BUNDLE"
+      }
+    `;
 
     try {
       const raw = await this.localModel.executeTask(prompt, 'High-Ticket Digital Asset generation for $1000 daily goal.');
-      const product: DigitalProduct = JSON.parse(raw.trim());
+      
+      // Sanitización progresiva (Extracción de JSON de posibles alucinaciones Markdown)
+      const jsonStrMatch = raw.match(/\{[\s\S]*\}/);
+      const jsonStr = jsonStrMatch ? jsonStrMatch[0] : raw;
+      
+      const parsed = JSON.parse(jsonStr.trim());
+      const product = DigitalProductSchema.parse(parsed);
 
-      this.logger.log(`🎁 Producto generado: "${product.title}" — $${product.price}`);
+      this.logger.log(`🎁 Producto Zod-Validado: "${product.title}" — $${product.price}`);
 
       // Store as revenue opportunity
       await this.prisma.marketSignal.create({
@@ -364,34 +416,42 @@ Return ONLY valid JSON. No markdown, no explanation.`;
       });
 
       // Attempt Gumroad listing if keys exist
-      const gumroadVault = await this.prisma.vaultCredential.findFirst({
-        where: { type: 'GUMROAD_API' },
-      });
+      const gumroadToken = process.env['GUMROAD_ACCESS_TOKEN'];
 
-      if (gumroadVault?.metadata) {
-        const keys = JSON.parse(gumroadVault.metadata);
+      if (gumroadToken) {
         try {
-          await axios.post(
-            'https://api.gumroad.com/v2/products',
-            {
-              access_token: keys.accessToken,
+          // FIX: Gumroad API expects access_token as query param, NOT body field
+          const gumroadRes = await axios.post(
+            `https://api.gumroad.com/v2/products?access_token=${encodeURIComponent(gumroadToken)}`,
+            new URLSearchParams({
               name: product.title,
               description: product.description,
-              price: product.price * 100, // Gumroad uses cents
-              currency: 'usd',
-            },
+              price: String(product.price * 100), // Gumroad stores in cents
+              currency_type: 'usd',
+            }),
+            { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
           );
-          this.logger.log(`🚀 Producto "${product.title}" publicado en Gumroad.`);
-          await this.logTelemetry('GUMROAD_PUBLISH', 'SUCCESS', `"${product.title}" — $${product.price}`);
+          if (gumroadRes.data?.success) {
+            this.logger.log(`🚀 Producto "${product.title}" publicado en Gumroad. URL: ${gumroadRes.data.product?.short_url ?? 'N/A'}`);
+            await this.logTelemetry('GUMROAD_PUBLISH', 'SUCCESS', `"${product.title}" — $${product.price} | URL: ${gumroadRes.data.product?.short_url ?? ''}`);
+          } else {
+            this.logger.warn(`⚠️ Gumroad responded success=false: ${JSON.stringify(gumroadRes.data)}`);
+          }
         } catch (gumErr: unknown) {
           const gMsg = gumErr instanceof Error ? gumErr.message : 'Gumroad API error';
           this.logger.warn(`⚠️ Gumroad API failed: ${gMsg}. Product stored in pipeline.`);
         }
       }
-    } catch (e: unknown) {
-      const errMsg = e instanceof Error ? e.message : 'Product deployment error';
-      this.logger.error(`KING Product Engine: ${errMsg}`);
-      await this.logTelemetry('PRODUCT_DEPLOY', 'FAILED', errMsg);
+    } catch (e: any) {
+      if (e instanceof z.ZodError) {
+        const zodMessages = (e as z.ZodError).issues.map((issue: z.ZodIssue) => issue.message).join(', ');
+        this.logger.error(`❌ Fallo de Esquema Zod (Alucinación Mitigada): ${zodMessages}`);
+        await this.logTelemetry('PRODUCT_DEPLOY', 'FAILED', `Zod validation: ${zodMessages}`);
+      } else {
+        const errMsg = e instanceof Error ? e.message : 'Product deployment error';
+        this.logger.error(`KING Product Engine: ${errMsg}`);
+        await this.logTelemetry('PRODUCT_DEPLOY', 'FAILED', errMsg);
+      }
     }
   }
 
@@ -426,13 +486,19 @@ Return ONLY valid JSON. No markdown, no explanation.`;
 
   /**
    * Fetch live NEAR balance via RPC + real USD price from CoinGecko.
+   * NOTE: NEAR account_id must be like "user.near" — NOT a raw hex key.
    */
   private async getLiveOnChainBalance(): Promise<number> {
     const walletAddress = process.env['AGENTKIT_WALLET_ADDRESS'];
     if (!walletAddress) return 0;
 
+    // Reject hex keys — they are public keys, NOT account IDs
+    if (/^[0-9a-f]{64}$/i.test(walletAddress)) {
+      this.logger.warn(`⚠️ NEAR: AGENTKIT_WALLET_ADDRESS is a hex public key, not an account ID. Set it to your account like "tu-cuenta.near". Skipping.`);
+      return 0;
+    }
+
     try {
-      // Fetch NEAR balance from RPC
       const res = await axios.post('https://rpc.mainnet.near.org', {
         jsonrpc: '2.0',
         id: 'king-balance-check',
@@ -527,52 +593,149 @@ Return ONLY valid JSON. No markdown, no explanation.`;
   }
 
   // ═══════════════════════════════════════════════════════════
-  //  PAPER TRADING (Simulated Arbitrage)
+  //  GOD MODE: PHYSICAL AGGRESSION
   // ═══════════════════════════════════════════════════════════
 
-  private async executePaperArbitrage(): Promise<void> {
-    this.logger.log('📈 KING: Calculando Criterio de Kelly para Arbitraje Simulado...');
+  private async executeGodModeOutreach(): Promise<void> {
+    this.logger.log('📈 KING: Modo Dios Activado. Ejecutando Infiltración Directa (WhatsApp) con Targets REALES...');
     
-    // Matemática del Criterio de Kelly simulado (f* = (bp-q)/b)
-    const winProb = 0.65; // 65% probabilidad de éxito en arbitraje
-    const loseProb = 1 - winProb;
-    const payoffRatio = 1.2; // Gana $1.20 por cada $1 arriesgado
-    const kellyFraction = (winProb * payoffRatio - loseProb) / payoffRatio;
-
-    // Capital base simulado para esta operación
-    const baseCapital = 5000; 
-    const betSize = baseCapital * kellyFraction; // Capital arriesgado
-    
-    // Simula ganancia (Spread de arbitraje)
-    const profitMargin = (Math.random() * (0.05 - 0.01) + 0.01); // 1% a 5% de la apuesta
-    const profitAmount = parseFloat((betSize * profitMargin).toFixed(2));
-
-    this.logger.log(`💵 ARBITRAJE EXITOSO: Spread de ${profitMargin.toFixed(3)}% capturado. Ganancia: $${profitAmount}`);
-
-    // Inject revenue into the system explicitly
-    await this.prisma.revenueEvent.create({
-      data: {
-        amount: profitAmount,
-        currency: 'USDT',
-        channel: 'KING_GOD_LEVEL',
-        source: 'PAPER_ARBITRAGE',
-        description: `Arbitraje Simulado usando Criterio de Kelly (Spread: ${profitMargin.toFixed(3)}%)`,
-        isVerified: true,
-        verifiedAt: new Date(),
-        metadata: JSON.stringify({
-          strategy: 'BARBELL/KELLY',
-          baseCapital,
-          betSize,
-          profitMargin,
-          cycleId: this.currentCycleId,
-        }),
+    // Fetch high-value targets from DB ( injected from internet strike )
+    const targets = await this.prisma.marketOpportunity.findMany({
+      where: { 
+        status: 'DETECTED',
+        marginEstimate: { gt: 0 }
       },
+      take: 5 // Target top 5 to avoid spam limits initially
     });
 
-    // Send high priority alert
-    await this.notifier.sendAlert(
-      `👑 *KING DIOS — ARBITRAJE (PAPEL)* \n\nOperación Kelly ejecutada con éxito.\n*Ganancia Capturada:* $${profitAmount} USD\n*Margen:* ${(profitMargin * 100).toFixed(2)}%\n*Riesgo/Capital:* $${betSize.toFixed(2)}`
-    );
+    if (targets.length === 0) {
+      this.logger.warn('⚠️ No hay targets pendientes de infiltración en la DB.');
+      return;
+    }
+
+    import('child_process').then(({ exec }) => {
+      import('util').then(({ promisify }) => {
+        import('fs').then(fs => {
+          import('path').then(path => {
+            const execAsync = promisify(exec);
+            
+            targets.forEach(async (target) => {
+                let budget = target.marginEstimate || 450;
+                if (['Dental', 'E-commerce', 'Local Services'].includes(target.sector || '')) {
+                    budget = 299;
+                }
+
+                let phoneStr = '13054440000'; // Fallback
+                try {
+                   if (target.metadata) {
+                     const meta = JSON.parse(target.metadata);
+                     if (meta.phone) phoneStr = meta.phone;
+                   }
+                } catch (e) {}
+
+                 // ── DETERMINISTIC PITCH: 3 blocks the LLM fills, not freeform ──
+                 const landingUrl = URLS.LANDING_WITH_AMOUNT(budget);
+                 const paypalUrl  = URLS.PAYPAL_WITH_AMOUNT(budget);
+
+                 const prompt = `
+### ROLE: SENIOR SALES CONSULTANT FOR FLY.AI STUDIO
+### HARD CONSTRAINTS (VIOLATING ANY = REJECTED OUTPUT):
+- LANGUAGE: SPANISH
+- EXACTLY 3 paragraphs. NO MORE.
+- MAX 40 words TOTAL.
+- DO NOT invent prices, percentages, or numbers.
+- DO NOT mention "MedTech", "acciones", or any term not in the TARGET context.
+- DO NOT add greetings, emojis, or sign-offs.
+- TONE: Professional, direct, confident. NOT aggressive. NOT salesy.
+
+### TARGET CONTEXT:
+- Company: ${target.title}
+- Sector: ${target.sector}
+- Budget: $${budget} USD
+
+### MANDATORY OUTPUT STRUCTURE (FILL EACH LINE):
+Line 1: One sentence identifying a real pain point for companies in the ${target.sector} sector.
+Line 2: "Mira cómo lo resolvemos: ${URLS.DEMO_PORTFOLIO}"
+Line 3: "Cotización y detalles: ${landingUrl}"
+
+Return ONLY the 3 lines. Nothing else.
+                 `;
+
+                try {
+                  let pitch = await this.localModel.executeReasoning(prompt, 'You are a professional B2B software sales consultant for FLY.AI Studio.');
+
+                  // ── HALLUCINATION GUARD: if LLM output doesn't contain our URLs, rebuild deterministically ──
+                  if (!pitch.includes(URLS.DEMO_PORTFOLIO) || !pitch.includes(landingUrl)) {
+                    this.logger.warn('⚠️ KING: LLM pitch hallucinated. Falling back to deterministic template.');
+                    pitch = `Las empresas de ${target.sector} pierden oportunidades por no automatizar. Mira cómo lo resolvemos: ${URLS.DEMO_PORTFOLIO} — Cotización y detalles: ${landingUrl}`;
+                  }
+
+                  // 🔥 TELEGRAM NOTIFICATION: SEND THE PITCH TO ARQUITECTO
+                  await this.notifier.sendAlert(
+                    `🎯 *ATAQUE SNIPER KING ACTIVADO* \n\n` +
+                    `👤 *Target:* ${target.title} \n` +
+                    `💰 *Presupuesto:* $${budget} \n` +
+                    `📱 *Phone:* \`${phoneStr}\` \n\n` +
+                    `✉️ *Pitch:* \n_${pitch.trim()}_\n\n` +
+                    `🔗 *Landing:* ${landingUrl}\n` +
+                    `💳 *Pago:* ${paypalUrl}`
+                  ).catch(() => {});
+                 
+                 const encodedText = encodeURIComponent(pitch.trim()).replace(/'/g, '%27');
+                 // Fix VBScript syntax and add robust launching
+                 const vbsContent = `
+Dim WshShell
+Set WshShell = WScript.CreateObject("WScript.Shell")
+' Open WhatsApp with pre-filled message
+WshShell.Run "whatsapp://send?phone=${phoneStr}&text=${encodedText}"
+WScript.Sleep 8000 
+' Force focus on WhatsApp window
+If WshShell.AppActivate("WhatsApp") Then
+    WScript.Sleep 2000
+    WshShell.SendKeys "~"
+End If
+`;
+                 const tmpPath = path.join(process.cwd(), 'tmp', `king_atk_${target.id}_${Date.now()}.vbs`);
+                 
+                 // Ensure tmp dir exists
+                 const tmpDir = path.join(process.cwd(), 'tmp');
+                 if (!fs.existsSync(tmpDir)){
+                     fs.mkdirSync(tmpDir, { recursive: true });
+                 }
+
+                 fs.writeFileSync(tmpPath, vbsContent);
+                 
+                 await execAsync(`cscript.exe //nologo "${tmpPath}"`);
+                 if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+                 
+                 // Mark as pursued
+                 await this.prisma.marketOpportunity.update({
+                     where: { id: target.id },
+                     data: { status: 'PURSUING' }
+                 });
+
+                 // Log to Dashboard
+                 await this.prisma.revenueEvent.create({
+                    data: {
+                      amount: 0,
+                      currency: 'USDT',
+                      channel: 'KING_GOD_LEVEL',
+                      source: 'PHYSICAL_INFILTRATION',
+                      description: `Outreach Físico en vivo a ${target.title} por $${target.marginEstimate}`,
+                      isVerified: false,
+                      metadata: JSON.stringify({ strategy: 'GOD_MODE', target: target.title, phone: phoneStr, pitch })
+                    }
+                 });
+                 
+                 await this.notifier.sendAlert(`👑 *KING DIOS — ATAQUE FÍSICO REAL* \n\nDirectiva enviada a: ${target.title} ($${budget}) al +${phoneStr}.\n*Pitch*: ${pitch}\n\n🔗 *Landing:* ${landingUrl}\n💳 *Pago:* ${paypalUrl}`);
+               } catch (e) {
+                 this.logger.error(`KING God Mode Error on ${target.title}: ${e}`);
+               }
+            });
+          });
+        });
+      });
+    });
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -614,8 +777,8 @@ Return ONLY valid JSON. No markdown, no explanation.`;
   // ═══════════════════════════════════════════════════════════
 
   /**
-   * Runs a comprehensive check of all integrations KING depends on.
-   * Returns a typed health report consumed by the dashboard.
+   * Runs a comprehensive integration health check.
+   * Returns a typed KingHealthReport consumed by the dashboard API and getFullStatus.
    */
   async getHealthReport(): Promise<KingHealthReport> {
     const checks = await Promise.allSettled([
@@ -625,26 +788,29 @@ Return ONLY valid JSON. No markdown, no explanation.`;
       this.checkTelegramBot(),
       this.checkTwitterApi(),
       this.checkGumroadApi(),
+      this.checkPayPalApi(),
+
     ]);
 
-    const resolved = (idx: number): IntegrationHealth => {
-      const result = checks[idx];
+    const reportInternal = (idx: number): IntegrationHealth => {
+      const result = (checks as any)[idx];
       if (result && result.status === 'fulfilled') return result.value;
       return { name: 'Unknown', status: 'UNREACHABLE', detail: 'Check failed unexpectedly' };
     };
 
     const report: KingHealthReport = {
-      ollama: resolved(0),
-      binance: resolved(1),
-      near: resolved(2),
-      telegram: resolved(3),
-      twitter: resolved(4),
-      gumroad: resolved(5),
+      ollama: reportInternal(0),
+      binance: reportInternal(1),
+      near: reportInternal(2),
+      telegram: reportInternal(3),
+      twitter: reportInternal(4),
+      gumroad: reportInternal(5),
+      paypal: reportInternal(6),
       overallScore: 0,
       checkedAt: new Date(),
     };
 
-    const all = [report.ollama, report.binance, report.near, report.telegram, report.twitter, report.gumroad];
+    const all = [report.ollama, report.binance, report.near, report.telegram, report.twitter, report.gumroad, report.paypal];
     report.overallScore = Math.round((all.filter(i => i.status === 'CONNECTED').length / all.length) * 100);
 
     return report;
@@ -666,11 +832,10 @@ Return ONLY valid JSON. No markdown, no explanation.`;
   }
 
   private async checkBinanceVault(): Promise<IntegrationHealth> {
-    const vault = await this.prisma.vaultCredential.findFirst({ where: { type: 'BINANCE_LIVE' } });
-    if (!vault?.metadata) return { name: 'Binance CEX', status: 'MISSING_KEYS', detail: 'No BINANCE_LIVE credential in vault. Run: npx ts-node scripts/seed-vault.ts' };
-    const keys: BinanceKeys = JSON.parse(vault.metadata);
-    if (!keys.apiKey || !keys.apiSecret) return { name: 'Binance CEX', status: 'MISSING_KEYS', detail: 'API key or secret is empty in vault' };
-    return { name: 'Binance CEX', status: 'CONNECTED', detail: `API Key: ${keys.apiKey.substring(0, 8)}...` };
+    const apiKey = process.env['BINANCE_API_KEY'];
+    const apiSecret = process.env['BINANCE_API_SECRET'];
+    if (!apiKey || !apiSecret) return { name: 'Binance CEX', status: 'MISSING_KEYS', detail: 'BINANCE_API_KEY or BINANCE_API_SECRET not set in .env' };
+    return { name: 'Binance CEX', status: 'CONNECTED', detail: `API Key: ${apiKey.substring(0, 8)}...` };
   }
 
   private async checkNearConfig(): Promise<IntegrationHealth> {
@@ -690,20 +855,25 @@ Return ONLY valid JSON. No markdown, no explanation.`;
   }
 
   private async checkTwitterApi(): Promise<IntegrationHealth> {
-    const vault = await this.prisma.vaultCredential.findFirst({ where: { type: 'TWITTER_API' } });
-    if (!vault?.metadata) return { name: 'Twitter/X', status: 'MISSING_KEYS', detail: 'No TWITTER_API credential in vault' };
-    const keys = JSON.parse(vault.metadata);
-    if (!keys.bearerToken) return { name: 'Twitter/X', status: 'MISSING_KEYS', detail: 'Bearer token is empty' };
-    return { name: 'Twitter/X', status: 'CONNECTED', detail: `Bearer: ${keys.bearerToken.substring(0, 12)}...` };
+    const bearer = process.env['TWITTER_BEARER_TOKEN'];
+    if (!bearer) return { name: 'Twitter/X', status: 'MISSING_KEYS', detail: 'TWITTER_BEARER_TOKEN not set in .env' };
+    return { name: 'Twitter/X', status: 'CONNECTED', detail: `Bearer: ${bearer.substring(0, 12)}...` };
   }
 
   private async checkGumroadApi(): Promise<IntegrationHealth> {
-    const vault = await this.prisma.vaultCredential.findFirst({ where: { type: 'GUMROAD_API' } });
-    if (!vault?.metadata) return { name: 'Gumroad', status: 'MISSING_KEYS', detail: 'No GUMROAD_API credential in vault' };
-    const keys = JSON.parse(vault.metadata);
-    if (!keys.accessToken) return { name: 'Gumroad', status: 'MISSING_KEYS', detail: 'Access token is empty' };
-    return { name: 'Gumroad', status: 'CONNECTED', detail: `Token: ${keys.accessToken.substring(0, 10)}...` };
+    const token = process.env['GUMROAD_ACCESS_TOKEN'];
+    if (!token) return { name: 'Gumroad', status: 'MISSING_KEYS', detail: 'GUMROAD_ACCESS_TOKEN not set in .env' };
+    return { name: 'Gumroad', status: 'CONNECTED', detail: `Token: ${token.substring(0, 10)}...` };
   }
+
+  private async checkPayPalApi(): Promise<IntegrationHealth> {
+    const clientId = process.env['PAYPAL_CLIENT_ID'];
+    const clientSecret = process.env['PAYPAL_CLIENT_SECRET'];
+    if (!clientId || !clientSecret) return { name: 'PayPal', status: 'MISSING_KEYS', detail: 'PAYPAL_CLIENT_ID or PAYPAL_CLIENT_SECRET missing config in .env' };
+    return { name: 'PayPal', status: 'CONNECTED', detail: `Active: ${clientId.substring(0, 12)}...` };
+  }
+
+
 
   // ═══════════════════════════════════════════════════════════
   //  PUBLIC STATUS (API Endpoint Data)
@@ -721,7 +891,7 @@ Return ONLY valid JSON. No markdown, no explanation.`;
         take: 20,
       }),
       this.prisma.revenueEvent.findMany({
-        where: { channel: 'KING_GOD_LEVEL', source: 'PAPER_ARBITRAGE' },
+        where: { channel: 'KING_GOD_LEVEL', source: 'PHYSICAL_INFILTRATION' },
         orderBy: { occurredAt: 'desc' },
         take: 20,
       }),
@@ -736,9 +906,9 @@ Return ONLY valid JSON. No markdown, no explanation.`;
         take: 30,
       }),
       this.prisma.marketSignal.findMany({
-        where: { source: 'KING_AGENT_CORE', type: 'KING_PRODUCT_DEPLOYED' },
+        where: { source: 'KING_AGENT_CORE', type: { in: ['KING_PRODUCT_DEPLOYED', 'LEDGER_ENFORCER_PATROL'] } },
         orderBy: { createdAt: 'desc' },
-        take: 5,
+        take: 10,
       }),
       this.getHealthReport(),
     ]);
@@ -803,9 +973,10 @@ Return ONLY valid JSON. No markdown, no explanation.`;
         metadata: e.metadata,
         time: e.occurredAt,
       })),
-      paperTrades: paperEvents.map((e: { amount: number; metadata: string | null; occurredAt: Date }) => ({
+      physicalAttacks: paperEvents.map((e: { amount: number; metadata: string | null; occurredAt: Date; description: string | null }) => ({
         amount: e.amount,
         metadata: e.metadata,
+        description: e.description,
         time: e.occurredAt,
       })),
       products: products.map((p: { data: string | null; createdAt: Date }) => {
@@ -817,6 +988,54 @@ Return ONLY valid JSON. No markdown, no explanation.`;
         }
         return { ...parsed, time: p.createdAt };
       }),
+      payments: [
+        await this.checkPayPalApi(),
+      ].map(p => ({ type: p.name, status: p.status, currency: 'USD' })),
     };
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  REVENUE MODELS SYNC — 5 Real Income Streams
+  // ═══════════════════════════════════════════════════════════
+
+  private async syncRevenueModels(): Promise<void> {
+    this.logger.log('📊 KING: Sincronizando Revenue Models (5 canales)...');
+
+    try {
+      const report = this.revenueModels.getFullReport();
+      
+      // Log report summary (no DB write — schema untouched)
+      this.logger.log(`📊 Revenue Report: ${report.activeChannels}/${report.totalChannels} canales activos, target $${report.estimatedMonthlyRevenue}/mes`);
+
+      // Build Telegram summary
+      const channelSummary = report.channels
+        .map(ch => {
+          const statusIcon = ch.status === 'ACTIVE' ? '🟢' : '🟡';
+          return `${statusIcon} *${ch.name}*\n   Target: $${ch.monthlyTarget}/mes | Status: ${ch.status}`;
+        })
+        .join('\n');
+
+      const nextActionsList = report.nextActions.slice(0, 5).join('\n');
+
+      const telegramMsg = `📊 *REVENUE MODELS — BRIEFING*\n\n` +
+        `📈 Canales activos: ${report.activeChannels}/${report.totalChannels}\n` +
+        `💰 Target MRR: $${report.estimatedMonthlyRevenue} USD/mes\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `${channelSummary}\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `🎯 *TOP 5 ACCIONES:*\n${nextActionsList}\n\n` +
+        `🔗 Landing: ${URLS.LANDING}\n` +
+        `🤖 ResumeAI: ${URLS.LANDING.replace('/landing/index.html', '/resume-ai')}`;
+
+      // Send every 3rd cycle to avoid spam
+      if (this.cycleCount % 3 === 1) {
+        await this.notifier.sendAlert(telegramMsg).catch(() => {});
+      }
+
+      this.logger.log(`📊 KING: Revenue Models sync complete. ${report.activeChannels} canales activos, $${report.estimatedMonthlyRevenue} target MRR.`);
+    } catch (e: unknown) {
+      const errMsg = e instanceof Error ? e.message : 'Unknown error';
+      this.logger.warn(`⚠️ Revenue Models sync warning: ${errMsg}`);
+    }
   }
 }

@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The 1% AI Engineering Elite | Autonomous Systems</title>
+  
+  <!-- Elite Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- GSAP & Lenis for Elite Scrolling -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+  
+  <style>
+    /* Reset & Custom Properties */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg-dark: #030305;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent-glow: #3b82f6;
+      --accent-neon: #00F0FF;
+      --accent-purple: #8B5CF6;
+      --glass: rgba(255, 255, 255, 0.03);
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+    }
+    .card-span-2 { grid-column: span 2; }
+    .card-min-300 { min-height: 300px; }
+    .card-border-neon { border-color: var(--accent-neon); }
+    .bg-accent-neon { background: var(--accent-neon); }
+    .flex-gap-1 { display: flex; gap: 1rem; }
+    
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+      background-color: var(--accent-purple);
+      color: #fff;
+    }
+
+    /* Core Layout */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 4vw;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Cinematic Background Canvas */
+    #ambient-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Glassmorphism & Borders */
+    .glass-panel {
+      background: rgba(10, 10, 15, 0.4);
+      -webkit-backdrop-filter: blur(24px);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+    }
+
+    /* Header */
+    nav {
+      position: fixed;
+      top: 0; width: 100%;
+      padding: 24px 0;
+      z-index: 100;
+      mix-blend-mode: difference;
+    }
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .brand-core {
+      width: 12px; height: 12px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 20px var(--accent-neon);
+      animation: corePulse 2s infinite alternate;
+    }
+    @keyframes corePulse {
+      0% { box-shadow: 0 0 10px var(--accent-neon), 0 0 20px var(--accent-purple); transform: scale(1); }
+      100% { box-shadow: 0 0 30px var(--accent-neon), 0 0 60px var(--accent-purple); transform: scale(1.2); }
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 10vh;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      align-self: flex-start; /* FIX: Prevents pill from stretching to full width */
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: var(--accent-neon);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 8px 16px;
+      border-radius: 100px;
+      margin-bottom: 2rem;
+      background: rgba(6, 182, 212, 0.05);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 8vw, 7.5rem); /* Slightly larger */
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.05em; /* Tighter tracking for true 1% editorial look */
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent-neon));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      max-width: 1200px;
+      will-change: transform, opacity;
+    }
+    .hero p {
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      color: var(--text-muted);
+      max-width: 700px;
+      line-height: 1.6;
+      margin-bottom: 3rem;
+      font-weight: 300;
+    }
+
+    /* Elite Identity Section */
+    .identity-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      padding: 15vh 0;
+    }
+    .identity-text h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 2rem;
+      letter-spacing: -0.02em;
+    }
+    .identity-text p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .code-block {
+      background: #09090b;
+      border: 1px solid #27272a;
+      border-radius: 16px;
+      padding: 2rem;
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      color: #10b981;
+      overflow: hidden;
+      position: relative;
+    }
+    .code-block::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-neon), transparent);
+      animation: scanline 3s linear infinite;
+    }
+
+    /* Products Framework */
+    .products-section {
+      padding: 10vh 0;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 5rem;
+    }
+    .section-header h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 1rem auto 0;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    .project-card {
+      position: relative;
+      padding: 4rem 3rem;
+      overflow: hidden;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.5s;
+      cursor: pointer;
+      display: flex; flex-direction: column; justify-content: space-between;
+      min-height: 480px;
+    }
+    
+    .project-card:hover {
+      transform: translateY(-10px);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .project-bg-glow {
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0;
+      transition: opacity 0.5s;
+      z-index: 0;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .project-card:hover .project-bg-glow { opacity: 0.15; }
+
+    .project-content { position: relative; z-index: 1; }
+    
+    .project-meta {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+      display: flex; gap: 1rem;
+    }
+
+    .project-title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .project-desc {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      max-width: 90%;
+    }
+
+    .btn-buy {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 1rem 2rem;
+      background: #fff;
+      color: #000;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.3s;
+      margin-top: 2rem;
+      border: none;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+    .btn-buy:hover {
+      background: var(--accent-neon);
+      color: #fff;
+      transform: scale(1.02);
+    }
+
+    /* Bundle Section */
+    .bundle-wrapper {
+      margin-top: 8rem;
+      padding: 6rem;
+      position: relative;
+      text-align: center;
+      overflow: hidden;
+    }
+    .bundle-wrapper::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15), transparent 60%);
+      z-index: 0;
+    }
+    .bundle-content { position: relative; z-index: 1; }
+    .bundle-price-tag {
+      font-family: var(--font-display);
+      font-size: 5rem;
+      font-weight: 900;
+      color: var(--accent-neon);
+      margin: 2rem 0;
+      letter-spacing: -0.03em;
+    }
+    .bundle-old-price {
+      font-size: 2rem;
+      color: #52525b;
+      text-decoration: line-through;
+      margin-right: 1rem;
+    }
+    
+    .footer {
+      padding: 4rem 0;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: 10vh;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: #52525b;
+    }
+
+    /* Spectacular Vault Modal Styles */
+    .vault-modal {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: radial-gradient(circle at top center, rgba(6, 182, 212, 0.15) 0%, rgba(3, 3, 5, 0.98) 80%);
+      -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px);
+      overflow-y: auto; padding: 4rem 4vw;
+      opacity: 0; transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .vault-modal::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px; z-index: -1;
+    }
+    .vault-modal.open { display: block; opacity: 1; }
+    .vault-close { 
+      position: absolute; top: 2rem; right: 4vw; cursor: pointer;
+      color: #fff; font-size: 3rem; font-family: var(--font-display);
+      transition: transform 0.3s, color 0.3s;
+    }
+    .vault-close:hover { color: var(--accent-neon); transform: rotate(90deg); }
+    .vault-header { text-align: center; margin-bottom: 4rem; position: relative; }
+    .vault-header h2 { 
+      font-family: var(--font-display); font-size: clamp(3rem, 6vw, 4.5rem); font-weight: 900; 
+      background: linear-gradient(135deg, #fff 30%, var(--accent-neon));
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -0.04em;
+    }
+    .vault-filters { 
+      display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 5rem; 
+    }
+    .vault-filter-btn {
+      background: rgba(0,0,0,0.5); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1);
+      padding: 0.8rem 2rem; border-radius: 100px; font-family: var(--font-code);
+      font-size: 0.85rem; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      letter-spacing: 0.05em; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .vault-filter-btn:hover, .vault-filter-btn.active {
+      border-color: var(--accent-neon); color: #fff; background: rgba(6, 182, 212, 0.2);
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), inset 0 0 10px rgba(6, 182, 212, 0.2);
+      transform: translateY(-2px);
+    }
+    .vault-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 3rem;
+      max-width: 1400px; margin: 0 auto; padding-bottom: 6rem;
+    }
+    .vault-card {
+      background: linear-gradient(180deg, rgba(30, 30, 35, 0.8) 0%, rgba(10, 10, 15, 0.9) 100%);
+      border: 1px solid rgba(255,255,255,0.05); border-top-width: 3px;
+      border-radius: 20px; padding: 2.5rem 2rem; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex; flex-direction: column; justify-content: space-between;
+      position: relative; overflow: hidden; opacity: 0; animation: vaultFadeIn 0.6s forwards;
+    }
+    @keyframes vaultFadeIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .vault-card::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at top right, var(--card-glow, rgba(255,255,255,0.1)) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.5s; pointer-events: none;
+    }
+    .vault-card:hover { 
+      transform: translateY(-10px) scale(1.02); 
+      border-color: rgba(255,255,255,0.2); 
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 30px var(--card-shadow, rgba(6, 182, 212, 0.2));
+    }
+    .vault-card:hover::after { opacity: 1; }
+
+    @media (max-width: 1024px) {
+      .projects-grid { grid-template-columns: 1fr; }
+      .identity-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .project-card { padding: 3rem 2rem; }
+      .bundle-wrapper { padding: 4rem 2rem; }
+      .bundle-price-tag { font-size: 3.5rem; }
+    }
+    /* Hardened Utility Classes */
+    #shuttle { position: fixed; z-index: 50; bottom: -600px; right: 8vw; width: 160px; pointer-events: none; mix-blend-mode: screen; display: flex; flex-direction: column; align-items: center; }
+    #shuttle img { width: 100%; object-fit: contain; z-index: 2; }
+    #smoke-canvas { position: absolute; top: 75%; z-index: 1; pointer-events: none; filter: blur(5px); }
+    .nav-status { font-family: var(--font-code); font-size: 0.8rem; letter-spacing: 0.1em; color: var(--accent-neon); }
+    .hero-pill-dot { display: inline-block; width: 6px; height: 6px; background: currentColor; border-radius: 50%; box-shadow: 0 0 10px currentColor; }
+    .hero-highlight { color: #fff; font-weight: 700; border-bottom: 2px solid var(--accent-neon); }
+    .code-syntax { line-height: 1.8; }
+    .project-accent-text { font-family: var(--font-code); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.5rem; display: flex; gap: 1rem; }
+    .vault-trigger-section { text-align: center; margin-top: 4rem; }
+    .btn-vault-outline { background: transparent; color: var(--accent-neon); border: 1px solid var(--accent-neon); font-size: 1rem; letter-spacing: 2px; }
+    .bundle-action-btn { font-size: 1.2rem; padding: 1.2rem 3rem; }
+    .bundle-header-title { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; }
+    .bundle-header-desc { color: var(--text-muted); font-size: 1.2rem; margin-top: 1rem; }
+    .bundle-disclaimer { margin-top: 2rem; font-family: var(--font-code); font-size: 0.8rem; color: #52525b; text-transform: uppercase; }
+    
+    .custom-section { padding: 15vh 0; margin-top: 5vh; }
+    .custom-container { padding: 5rem 3rem; max-width: 800px; margin: 0 auto; text-align: center; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 20px; box-shadow: 0 0 40px rgba(139, 92, 246, 0.05); }
+    .custom-title { font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 1rem; color: #fff; }
+    .custom-desc { color: var(--text-muted); margin-bottom: 3rem; font-size: 1.1rem; line-height: 1.6; }
+    .input-field { width: 100%; padding: 1.2rem; margin-bottom: 1rem; background: rgba(0,0,0,0.5); border: 1px solid #27272a; color: white; border-radius: 12px; font-family: var(--font-body); font-size: 1rem; outline: none; }
+    .btn-deploy-custom { width: 100%; margin-top: 0; background: linear-gradient(90deg, var(--accent-neon), var(--accent-purple)); color: #fff; font-size: 1.1rem; padding: 1.2rem; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: transform 0.2s; }
+    .btn-deploy-custom:hover { transform: scale(1.01); }
+
+    .success-panel { text-align: center; }
+    .success-icon-blob { width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.5rem; }
+    .success-msg-title { color: #10b981; font-family: var(--font-display); font-size: 1.8rem; margin-bottom: 1rem; }
+    .success-msg-p { color: var(--text-main); margin-bottom: 2rem; font-size: 1.1rem; }
+    .success-cta-wrap { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .chat-btn { margin-top: 0; border-radius: 100px; padding: 0.8rem 1.5rem; display: flex; gap: 8px; align-items: center; border: none; font-weight: bold; text-decoration: none; transition: transform 0.2s; }
+    .chat-btn:hover { transform: translateY(-2px); }
+    .chat-wa { background: #25D366; color: white; }
+    .chat-tg { background: #0088cc; color: white; }
+    .vault-subtitle { color: var(--text-muted); margin-top: 1rem; }
+    .hidden { display: none !important; }
+
+    /* ELITE TITLE SYSTEM */
+    @keyframes title-shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes title-glow-pulse {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(0,240,255,0.2)); }
+      50% { filter: drop-shadow(0 0 40px rgba(0,240,255,0.45)); }
+    }
+    .title-accent {
+      background: linear-gradient(90deg, #22d3ee 0%, #67e8f9 25%, #ffffff 50%, #67e8f9 75%, #22d3ee 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: title-shimmer 6s linear infinite, title-glow-pulse 4s ease-in-out infinite;
+    }
+    .title-accent-static {
+      color: #22d3ee;
+      text-shadow: 0 0 30px rgba(0,240,255,0.25), 0 0 80px rgba(0,240,255,0.08);
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- The Photorealistic NASA Shuttle with Dynamic Engine -->
+  <div id="shuttle">
+    <img src="ultimate_shuttle.png" alt="Space Shuttle">
+    <canvas id="smoke-canvas" width="300" height="500"></canvas>
+  </div>
+
+  <!-- Canvas for Ambient WebGL effect (simulated with HTML5 Canvas API) -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <nav>
+    <div class="container nav-inner">
+      <div class="brand">
+        <div class="brand-core"></div>
+        FLY.AI STUDIO
+      </div>
+      <div class="nav-status">
+        STATUS: ONLINE // v4.7.1
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero container">
+      <div class="hero-badge gs-reveal">
+        <span class="hero-pill-dot"></span>
+             <span>Elite Engineering v4.7.1</span>
+      </div>
+      <h1 class="gs-reveal">We engineer <span class="title-accent">sovereign software</span>, not simple websites.</h1>
+      <p class="gs-reveal">
+        El desarrollo web de élite no es una plantilla; es una obra de ingeniería determinista. Combinamos interfaces de ultra alta gama con infraestructuras backend que operan con precisión militar.
+        <br><br>
+        Somos la firma <span class="hero-highlight">Líder en Arquitectura Digital Autónoma</span>. Especialistas en diseño y desarrollo web para el 1% superior que exige escala, seguridad y un diseño que intimida a la competencia.
+      </p>
+    </section>
+
+    <section class="identity-grid container">
+      <div class="identity-text">
+        <h2 class="gs-reveal">Experience Design & Engineering Supremacy.</h2>
+        <p class="gs-reveal">El 99% de desarrolladores intentan resolver todo con un solo prompt masivo. Nosotros separamos la lógica en 4 monolitos: <strong>Intelligence Core, The Swarm, Engine Room, y Telemetry.</strong></p>
+        <p class="gs-reveal">Nuestros motores combinan el caos creativo de la IA con la dictadura militar de la Ingeniería tradicional (PostgreSQL, NestJS, FSM, Webhooks HMAC). Cero simulaciones, todo en producción.</p>
+      </div>
+      <div class="glass-panel code-block gs-reveal">
+        <pre><code class="code-syntax">
+// THE 1% DIFFERENCE ARCHITECTURE
+
+async function AutonomousEngine() {
+  const signal = await Observer.scan(Market);
+  
+  // 1. Validation Shield (Zero Trust)
+  const schema = z.object({ target: z.string() });
+  
+  // 2. Swarm Cognitive Step
+  const intent = await LLM_Router.classify(signal);
+  
+  // 3. Deterministic Engine Exec
+  if (intent.confidence > 0.99) {
+    const trx = await DB.transaction();
+    await PaymentGateway.chargeRealRevenue(intent);
+    await trx.commit();
+  }
+}
+        </code></pre>
+      </div>
+    </section>
+
+    <section class="products-section container">
+      <div class="section-header gs-reveal">
+        <h2>The Elite Arsenal: <span class="title-accent">Industrial Code</span></h2>
+        <p>Acquire the absolute bleeding-edge source code. Pure Next.js 15, Strict TypeScript, Framer Motion, perfectly typed robust components.</p>
+      </div>
+
+      <div class="projects-grid">
+        
+        <!-- P1: BBVA -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow p-glow-cyan"></div>
+          <div class="project-content">
+            <div class="project-accent-text">
+              <span class="text-accent-cyan">FINTECH</span>
+              <span>SECURITY</span>
+            </div>
+            <h3 class="project-title">Neural Security Vault</h3>
+            <p class="project-desc">Tablero de biometría y seguridad cibernética grado bancario. Monitoreo de amenazas, KPIs en tiempo real y UI dark-mesh impecable.</p>
+          </div>
+          <button onclick="buyTemplate('Neural Security Vault', 49)" class="btn-buy">Adquiera la plantilla — $49</button>
+        </div>
+
+        <!-- P2: Baker McKenzie -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow p-glow-purple"></div>
+          <div class="project-content">
+            <div class="project-accent-text">
+              <span class="text-accent-purple">LEGAL</span>
+              <span>AI SCANNER</span>
+            </div>
+            <h3 class="project-title">Legal Intelligence Engine</h3>
+            <p class="project-desc">Análisis de contratos y evaluación de riesgos corporativos con tipografía editorial (Instrument Serif) y diseño minimalista de ultra alta gama.</p>
+          </div>
+          <button onclick="buyTemplate('Legal Intelligence Engine', 49)" class="btn-buy">Adquiera la plantilla — $49</button>
+        </div>
+
+        <!-- P3: Sotheby's -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow p-glow-amber"></div>
+          <div class="project-content">
+            <div class="project-accent-text">
+              <span class="text-accent-amber">REAL ESTATE</span>
+              <span>WEALTH</span>
+            </div>
+            <h3 class="project-title">Wealth Management Sys</h3>
+            <p class="project-desc">Gestión de portafolios hiper-lujosos para ultra-high-net-worth individuals. Analíticas fluidas, estética brutalista refinada.</p>
+          </div>
+          <button onclick="buyTemplate('Wealth Management Sys', 49)" class="btn-buy">Adquiera la plantilla — $49</button>
+        </div>
+
+        <!-- P4: CRM -->
+        <div class="glass-panel project-card gs-reveal">
+          <div class="project-bg-glow p-glow-red"></div>
+          <div class="project-content">
+            <div class="project-accent-text">
+              <span class="text-accent-red">SaaS</span>
+              <span>B2B CRM</span>
+            </div>
+            <h3 class="project-title">Autonomous CRM Master</h3>
+            <p class="project-desc">Sistema definitivo para seguimiento de pipelines, conversiones e integración fluida de datos para equipos de ventas masivas.</p>
+          </div>
+          <button onclick="buyTemplate('Autonomous CRM Master', 49)" class="btn-buy">Adquiera la plantilla — $49</button>
+        </div>
+
+        <!-- P5: EXPRESS FIX -->
+        <div class="glass-panel project-card gs-reveal card-span-2 card-min-300 card-border-neon">
+          <div class="project-bg-glow bg-accent-neon"></div>
+          <div class="project-content">
+            <div class="project-accent-text">
+              <span class="text-accent-neon">EXPRESS</span>
+              <span>BOUNTY HUNTER</span>
+            </div>
+            <h3 class="project-title">⚡ FLY.AI Express Fix</h3>
+            <p class="project-desc">¿Necesitas un fix técnico inmediato? Centrado de elementos, depuración de scripts Python/JS o configuración de Cloud. Entrega en < 60 mins.</p>
+          </div>
+          <div class="flex-gap-1">
+            <button onclick="buyTemplate('Express Minor Fix', 5)" class="btn-buy">Minor Fix — $5</button>
+            <button onclick="buyTemplate('Core Debug Bounty', 10)" class="btn-buy">Core Debug — $10</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="vault-trigger-section gs-reveal">
+        <button onclick="toggleVault()" class="btn-buy btn-vault-outline">
+          EXPLORAR ARQUITECTURAS (VAULT) ➔
+        </button>
+      </div>
+
+      <div class="glass-panel bundle-wrapper gs-reveal">
+        <h2 class="bundle-header-title">Total Dominance: <span class="title-accent">The Full Stack</span></h2>
+        <p class="bundle-header-desc">Lleva las 4 arquitecturas empresariales. Código fuente completo. Inicia en 5 minutos.</p>
+        <div class="bundle-price-tag">
+          <span class="bundle-old-price">$196</span>$149
+        </div>
+        <button onclick="buyTemplate('Full Matrix Bundle (4 Templates)', 149)" class="btn-buy bundle-action-btn">Adquiera el Stack Completo</button>
+        <p class="bundle-disclaimer">
+          Envía el comprobante a alejandromonroy2020dijital@gmail.com
+        </p>    <!-- CUSTOM DEV REQUEST FORM -->
+    <section id="custom-ai" class="container gs-reveal custom-section">
+      <div class="custom-container">
+        <h2 class="custom-title"><span class="grad-accent">Bespoke</span> Architectural Request</h2>
+        <p class="custom-desc">
+          ¿Tienes una visión que el código genérico no puede alcanzar? Comparte tu visión de backend o infraestructura de IA. Nuestro equipo de desarrollo de élite lo construirá desde cero a la perfección.
+        </p>
+        
+        <div id="request-form">
+          <input type="text" id="req-name" placeholder="Tu Nombre / Entidad" class="input-field">
+          <textarea id="req-desc" rows="5" placeholder="¿Qué necesitas que diseñemos y programemos para tu empresa?..." class="input-field"></textarea>
+          <button onclick="submitRequest()" class="btn-deploy-custom">Deploy Custom Request</button>
+        </div>
+
+        <div id="request-success" class="success-panel hidden">
+          <div class="success-icon-blob">✅</div>
+          <h3 class="success-msg-title">Transmission Secured</h3>
+          <p class="success-msg-p">Tu visión está en camino a nuestros servidores. Conéctate con nosotros inmediatamente vía chat para revisar la arquitectura y acelerar el desarrollo:</p>
+          <div class="success-cta-wrap">
+            <a href="https://wa.me/573214366769" target="_blank" rel="noopener" class="btn-buy chat-btn chat-wa">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+              Chat WhatsApp
+            </a>
+            <a href="https://t.me/miBisnessFly_bot" target="_blank" rel="noopener" class="btn-buy chat-btn chat-tg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 24c6.627 0 12-5.373 12-12S18.627 0 12 0 0 5.373 0 12s5.373 12 12 12Z" fill="#0088cc"/><path d="m5.445 11.838 12.182-4.704c.565-.205 1.05.137.863 1.01l-2.073 9.771c-.173.784-.644.981-1.306.608l-3.608-2.659-1.741 1.677c-.193.193-.355.355-.73.355l.261-3.682 6.702-6.046c.29-.26-.062-.405-.448-.146L7.26 13.256l-3.57-1.12c-.776-.244-.792-.776.155-1.147Z" fill="#fff"/></svg>
+              Connect Telegram ID
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      &copy; 2026 FLY.AI STUDIO · ELITE ENGINEERING & ARCHITECTURE · ZERO SIMULATIONS
+    </div>
+  </footer>
+
+  <!-- FULL PROJECTS VAULT MODAL (Includes data-lenis-prevent to allow scrolling inside over Lenis) -->
+  <div id="vault-modal" class="vault-modal" data-lenis-prevent="true">
+    <div class="vault-close" onclick="toggleVault()">×</div>
+    <div class="vault-header">
+      <h2>Architecture Vault</h2>
+      <p class="vault-subtitle">Nuestra bóveda clasificada de despliegues élite listos para inyección.</p>
+    </div>
+    
+    <div class="vault-filters">
+      <button class="vault-filter-btn active" onclick="filterVault('all')">ALL SYSTEMS</button>
+      <button class="vault-filter-btn" onclick="filterVault('fintech')">FINTECH / BANKING</button>
+      <button class="vault-filter-btn" onclick="filterVault('legal')">LEGAL / CORPORATE</button>
+      <button class="vault-filter-btn" onclick="filterVault('realestate')">REAL ESTATE / PROPTECH</button>
+      <button class="vault-filter-btn" onclick="filterVault('saas')">SAAS / B2B</button>
+      <button class="vault-filter-btn" onclick="filterVault('agents')">AUTONOMOUS AGENTS</button>
+    </div>
+
+    <div class="vault-grid" id="vault-grid">
+      <!-- Injected via JS -->
+    </div>
+  </div>
+
+  <script>
+    async function buyTemplate(title, price) {
+      // Check for dynamic amount in URL (from sniper outreach links)
+      const urlParams = new URLSearchParams(window.location.search);
+      const dynamicAmount = urlParams.get('amount');
+      const finalPrice = dynamicAmount ? parseFloat(dynamicAmount) : price;
+      
+      if(!confirm(`Deseas iniciar el despliegue de: ${title} ($${finalPrice} USD)?`)) return;
+      
+      // Direct PayPal.me redirect — works from any domain, no backend required
+      const paypalUrl = `https://paypal.me/LuisMonroy76/${finalPrice}`;
+      window.open(paypalUrl, '_blank');
+    }
+
+    // Reveal form logic
+    async function submitRequest() {
+      const name = document.getElementById('req-name').value;
+      const desc = document.getElementById('req-desc').value;
+      const btn = event.target;
+      
+      if (name && desc) {
+        btn.disabled = true;
+        btn.innerText = "TRANSMITTING DATA...";
+        
+        try {
+          const response = await fetch('http://localhost:4000/api/production/projects', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: `Custom Architecture: ${name}`,
+              description: desc,
+              clientName: name,
+              priority: 'HIGH',
+              metadata: { source: 'landing_page_offer' }
+            })
+          });
+
+          if (response.ok) {
+            document.getElementById('request-form').classList.add('hidden');
+            document.getElementById('request-success').classList.remove('hidden');
+            
+            // Interaction feedback
+            gsap.from("#request-success", { duration: 1, y: 30, opacity: 0, ease: "power3.out" });
+          } else {
+            throw new Error('Neural transmission failed');
+          }
+        } catch (error) {
+          console.error(error);
+          alert("ENGINEERING ALERT: Error en la transmisión neural. Verifica la conexión con el servidor.");
+          btn.disabled = false;
+          btn.innerText = "Deploy Custom Request";
+        }
+      } else {
+        alert("ENGINEERING SECURE PROTOCOL: Por favor completa todos los campos para el despliegue.");
+      }
+    }
+
+    // Vault Logic & Database
+    const vaultDatabase = [
+      { id: 1, type: 'fintech', title: 'Neural Security Vault', desc: 'Biometría y seguridad cibernética grado bancario.', price: '$49' },
+      { id: 2, type: 'fintech', title: 'Quantum Ledger API', desc: 'Conciliación bancaria vía LLMs locales.', price: '$49' },
+      { id: 3, type: 'legal', title: 'Legal Intelligence Engine', desc: 'Análisis de riesgos corporativos y M&A.', price: '$49' },
+      { id: 4, type: 'legal', title: 'Auto-Litigation Drafter', desc: 'Redactor automatizado de jurisprudencia.', price: '$69' },
+      { id: 5, type: 'realestate', title: 'Wealth Management Sys', desc: 'Gestión hiper-lujosa de portafolios (HNWI).', price: '$49' },
+      { id: 6, type: 'realestate', title: 'Predictive Prop-Valuer', desc: 'Tasador inteligente de rentabilidad zonal.', price: '$89' },
+      { id: 7, type: 'saas', title: 'Autonomous CRM Master', desc: 'B2B Pipelines y prospección automatizada.', price: '$49' },
+      { id: 8, type: 'saas', title: 'GodMode Outreach Core', desc: 'Cerebro de adquisición de cold-leads.', price: '$120' },
+      { id: 9, type: 'agents', title: 'Swarm Hive-Mind', desc: 'Coordinador de agentes múltiples (Multi-Agent).', price: '$199' },
+      { id: 10, type: 'agents', title: 'Telegram Sales Daemon', desc: 'Bot que cierra ventas con Stripe/PayPal nativo.', price: '$85' },
+      { id: 11, type: 'saas', title: 'Express UI Fix', desc: 'Reparación inmediata de estilos y responsividad.', price: '$5' },
+      { id: 12, type: 'agents', title: 'Rapid Logic Debug', desc: 'Intercepción y corrección de bugs en tiempo real.', price: '$15' }
+    ];
+
+    function toggleVault() {
+      const v = document.getElementById('vault-modal');
+      v.classList.toggle('open');
+      if(v.classList.contains('open')) {
+        filterVault('all');
+        if(typeof lenis !== 'undefined') lenis.stop(); // Pause body parallax
+      } else {
+        if(typeof lenis !== 'undefined') lenis.start(); // Resume original scrolling
+      }
+    }
+
+    function filterVault(category) {
+      document.querySelectorAll('.vault-filter-btn').forEach(b => b.classList.remove('active'));
+      if(event && event.target) {
+        event.target.classList.add('active');
+      }
+      
+      const grid = document.getElementById('vault-grid');
+      grid.innerHTML = '';
+      
+      const filtered = category === 'all' ? vaultDatabase : vaultDatabase.filter(m => m.type === category);
+      
+      filtered.forEach((p, index) => {
+        let colorCode = '#06b6d4'; // Default Cyan for Fintech
+        if(p.type === 'legal') colorCode = '#8b5cf6'; // Purple
+        if(p.type === 'realestate') colorCode = '#fbbf24'; // Gold
+        if(p.type === 'saas') colorCode = '#ef4444'; // Red
+        if(p.type === 'agents') colorCode = '#10b981'; // Emerald
+
+        const d = document.createElement('div');
+        d.className = 'vault-card';
+        d.style.setProperty('--card-glow', `${colorCode}22`);
+        d.style.setProperty('--card-shadow', `${colorCode}66`);
+        d.style.borderTopColor = colorCode;
+        d.style.animationDelay = `${index * 0.05}s`;
+        
+        d.innerHTML = `
+          <div style="position: relative; z-index: 2;">
+            <div style="font-family:var(--font-code); font-size:0.75rem; color:${colorCode}; margin-bottom:1.5rem; text-transform:uppercase; letter-spacing:0.15em; display:inline-block; border: 1px solid ${colorCode}44; padding: 0.3rem 0.8rem; border-radius: 100px; background: ${colorCode}11;">
+              ● SYS_${p.type.toUpperCase()}
+            </div>
+            <h3 style="font-family:var(--font-display); font-size:2rem; line-height: 1.1; margin-bottom:1rem; font-weight:800; color:#fff; letter-spacing:-0.02em;">${p.title}</h3>
+            <p style="color:var(--text-muted); font-size:1rem; line-height:1.6; font-weight: 300;">${p.desc}</p>
+          </div>
+          <button style="position: relative; z-index: 2; margin-top:2.5rem; width:100%; padding:1rem; background:transparent; color:#fff; font-weight:bold; font-family:var(--font-body); border-radius:12px; cursor:pointer; border: 1px solid ${colorCode}66; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em;" 
+            onmouseover="this.style.background='${colorCode}'; this.style.borderColor='${colorCode}'; this.style.color='#000';" 
+            onmouseout="this.style.background='transparent'; this.style.borderColor='${colorCode}66'; this.style.color='#fff';"
+            onclick="buyTemplate('${p.title}', ${p.price.replace('$', '')})">
+            Adquirir Capa / ${p.price}
+          </button>
+        `;
+        grid.appendChild(d);
+      });
+    }
+
+    // Initialize Lenis Smooth Scroll
+    const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+
+    // -- SPACESHIP DIRECT MISSILE FLIGHT (BOTTOM TO TOP) --
+    gsap.registerPlugin(ScrollTrigger);
+    
+    gsap.to("#shuttle", {
+      y: - (document.documentElement.scrollHeight + 1000), // Direct plunge UPWARDS
+      x: 0,
+      scale: 1, // Keep scale consistent
+      ease: "power1.inOut",
+      scrollTrigger: {
+        trigger: "body",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 0.8 // Direct solid scrubbing
+      }
+    });
+
+    // Fade up animations
+    const revealElements = document.querySelectorAll('.gs-reveal');
+    revealElements.forEach((el) => {
+      gsap.fromTo(el, 
+        { autoAlpha: 0, y: 50 }, 
+        { 
+          duration: 1, 
+          autoAlpha: 1, 
+          y: 0, 
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 85%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    });
+
+    // Custom Canvas Ambient Particle System (WebGL-like feel)
+    const canvas = document.getElementById('ambient-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let particles = [];
+    
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 2;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.speedY = Math.random() * 1 - 0.5;
+        this.opacity = Math.random() * 0.5 + 0.1;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > width) this.speedX *= -1;
+        if (this.y < 0 || this.y > height) this.speedY *= -1;
+      }
+      draw() {
+        ctx.fillStyle = `rgba(6, 182, 212, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    function initParticles() {
+      particles = [];
+      const particleCount = Math.floor((width * height) / 15000);
+      for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+    }
+    initParticles();
+    
+    function drawLines() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 120) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(139, 92, 246, ${0.1 - distance/1200})`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+    
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      drawLines();
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // -- SHUTTLE SMOKE VOLUMETRIC PARTICLE SYSTEM --
+    const smokeCanvas = document.getElementById('smoke-canvas');
+    const sCtx = smokeCanvas.getContext('2d');
+    let smokeParticles = [];
+
+    class SmokeParticle {
+      constructor() {
+        // Tightly focused under the thrusters (3 main exhaust points)
+        const exhaustPoints = [135, 150, 165]; 
+        this.x = exhaustPoints[Math.floor(Math.random() * exhaustPoints.length)] + (Math.random() * 6 - 3); 
+        this.y = 10; // Immediately abutting the engines
+        
+        // Base size, smaller for a focused flame
+        this.size = Math.random() * 10 + 5;
+        
+        // Very tight horizontal spread (focused pillar of fire)
+        this.speedX = (Math.random() - 0.5) * 1.5; 
+        this.speedY = Math.random() * 12 + 8; // Extreme downwards thrust
+        this.life = 1.0;
+        
+        // Heavy realistic fire mapping (85% Flames, 15% Smoke)
+        const rand = Math.random();
+        if (rand > 0.90) {
+          this.color = `rgba(255, 255, 255, `; // Blinding White Core
+        } else if (rand > 0.60) {
+          this.color = `rgba(255, 200, 0, `;   // Bright Yellow Flame
+        } else if (rand > 0.25) {
+          this.color = `rgba(255, 80, 0, `;    // Intense Orange Fire
+        } else if (rand > 0.15) {
+          this.color = `rgba(220, 20, 0, `;    // Dark Red Fire Edge
+        } else {
+          this.color = `rgba(80, 80, 80, `;    // Thick Gray Smoke
+        }
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.size += 0.5; // Expands slowly, stays tight
+        this.life -= 0.035; // Fades faster to keep the flame short and sharp
+      }
+      draw() {
+        // Create ultra-realistic volumetric fuzzy puff using Radial Gradients instead of flat circles
+        const gradient = sCtx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+        gradient.addColorStop(0, this.color + Math.max(this.life, 0) + ')');
+        gradient.addColorStop(0.5, this.color + Math.max(this.life * 0.5, 0) + ')');
+        gradient.addColorStop(1, this.color + '0)');
+        
+        sCtx.fillStyle = gradient;
+        sCtx.fillRect(this.x - this.size, this.y - this.size, this.size * 2, this.size * 2);
+        
+        // Add extreme core glow for plasma particles
+        if (this.color.includes('255, 255, 255') || this.color.includes('14, 215, 240')) {
+          const coreGrad = sCtx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 0.3);
+          coreGrad.addColorStop(0, `rgba(255,255,255,${this.life})`);
+          coreGrad.addColorStop(1, `rgba(255,255,255,0)`);
+          sCtx.fillStyle = coreGrad;
+          sCtx.fillRect(this.x - this.size, this.y - this.size, this.size * 2, this.size * 2);
+        }
+      }
+    }
+
+    function animateSmoke() {
+      // Clear with slight trailing opacity for motion blur effect
+      sCtx.globalCompositeOperation = 'destination-out';
+      sCtx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      sCtx.fillRect(0, 0, smokeCanvas.width, smokeCanvas.height);
+      sCtx.globalCompositeOperation = 'lighter'; // Additive blending for pure fire
+      
+      // Inject thick volumetric particles continuously
+      for(let i=0; i<8; i++) {
+        smokeParticles.push(new SmokeParticle());
+      }
+      
+      for (let i = smokeParticles.length - 1; i >= 0; i--) {
+        let p = smokeParticles[i];
+        p.update();
+        p.draw();
+        if(p.life <= 0) {
+          smokeParticles.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(animateSmoke);
+    }
+    animateSmoke();
+  </script>
+</body>
+</html>
